@@ -1,0 +1,294 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" dir="ltr" xmlns:og="http://ogp.me/ns#" xmlns:mixi="http://mixi-platform.com/ns#" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="ParticleEditor for cocos2dx. WebBased. Win&Mac.">
+
+<meta property="og:title" content="Particle2dx" />
+<meta property="og:type" content="tool" />
+<meta property="og:url" content="http://www.particle2dx.com/" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="og:image" content="http://www.particle2dx.com/thumbnail.png" />
+<meta property="og:site_name" content="ParticleEditor for cocos2dx. WebBased. Win&Mac." />
+<meta property="og:description" content="ParticleEditor for cocos2dx. WebBased. Win&Mac." />
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<title>Particle2dx doc</title>
+<style>
+body{
+	color: #bbbbbb;
+	font-size:80%;
+	background-color:#222222;	
+}
+h3{
+	color:white;
+	border-bottom:1px solid #444444;
+}
+h4{
+	color:#cccccc;
+	border-bottom:1px solid #444444;
+	margin:5px;
+}
+p{
+	margin-left:20px;
+}
+img{
+	padding:15px;
+}
+.code{
+	margin-left:40px; 
+	font-style:italic;	
+}
+
+
+a:link {color: #88ccff;text-decoration: none; }
+a:visited {color: #88ccff;text-decoration: none;}
+a:hover {color: #88ccff;text-decoration: underline;}
+</style>
+</head>
+<body>
+
+<h3>WebベースのCocos2dx用パーティクルエディタ</h3>
+
+	<p>
+		パーティクルは「粒子」の意味です。<br/>
+		ゲーム部品としては、単純な画像を粒子のように大量に動かして爆発や水を表現する技法をいいます。<br/>
+	</p>
+	<p style="background-color:black;" >	
+			<img src="docimg/1.png" />
+			<img src="docimg/2.png" />
+			<img src="docimg/3.png" />
+			<img src="docimg/4.png" />	
+			<img src="docimg/5.png" />	
+	</p>
+	<p>	
+		これらは10-200枚の同じ画像の組み合わせて出来ています。<br/>
+		<br/>
+		cocos2dxにもパーティクルがあり、50個前後の設定パラメータと画像をまとめたPList(XML)を呼び出して使います。<br/>
+		<br/>
+		C++だとこのように呼び出します。<br/>
+	</p>
+		<div class="code">
+			ParticleSystemQuad* particle = ParticleSystemQuad::create("particle.plist"); //plist読み込み<br/>
+			this->addChild(particle); //画面に追加<br/>
+		</div>
+	<p>
+		これで上のようなパーティクルが出ます。<br/>
+		<br/>	
+		Particle2dxはそのパーティクルを、直感マウス操作とショートカットキーですばやく作ってPListに書き出せるサイトです。<br/>
+	</p>
+
+<h3>パーティクルを作りましょう</h3>
+	<p>
+		ここからは別Windowで<a href="http://particle2dx.com">Particle2dx</a>の画面を開きましょう<br/>
+		実際にパーティクルを作ります。<br/>
+	</p>
+
+<h3>まずテンプレートから選択</h3>
+	<p>
+		Tキーでテンプレートパネルが開きます。<br/>
+		<img src="docimg/template.png" /><br/>
+		炎や煙や魔法のテンプレートをここから選択すると、左の画面でパーティクルが動きます。<br/>
+		使うテンプレートが決まったら動きや色を調整して自分のパーティクルにします。<br/>
+		<br/>
+		パーティクルが放出される領域をEmitterといいます。英語で「放出領域、放出体」の意味です。<br/>
+	</p>
+
+<h3>Start〜End の色、サイズ、回転</h3>
+
+	<p>
+		次に色やサイズを変更します。<br/>
+		Cを押してColor&Shapeのパネルを開きます<br/>
+		図形をクリックするとテクスチャ（パーティクルの元の画像）が変わり、同じ動きでも雰囲気が違ってきます。<br/>
+		
+		<img src="docimg/texture.png" style="border-style: solid 1px;"/><br/>
+		
+		炎や煙は輪郭のぼやけた画像が向いています。<br/>
+		<br/>
+		色パネルをクリックしてみましょう。<br/>
+		
+		<img src="docimg/col.png" style="border-style: solid 1px;"/><br/>
+		
+		パーティクルの色が変わりましたか？<br/>
+		この色は下で説明する「startColor」になります。<br/>
+		<br/>
+		炎や煙は輪郭のぼやけた画像が向いています。<br/>
+		<br/>
+		particleの粒子それぞれが発生して消えるまでの間は、<br/>
+		startcolorの色、startsizeの大きさ、startSpinの回転から始まって、end〜のそれぞれの値へと色や形が変化します。<br/>
+		色は下のスライダでも変えられます。<br/>
+		
+		<img src="docimg/start_end.png" style="border-style: solid 1px;"/><br/>
+		
+		スライダは色パネルと違ってRed,Green,Blueといった特定の色だけを変えて行けます。<br/>
+		また、色パネルでは出来ない透明度(Alpha)も変えられます
+	</p>
+
+<h3>パーティクル粒子の数、生存時間</h3>
+	<p>
+		
+		Mを押してMotionパネルを開きましょう。<br/>
+		<img src="docimg/lifetime.png" style="border-style: solid 1px;"/><br/>
+		duration はEmitterの生存時間です。<br/>
+		2にすると2秒間だけパーティクルを放出して、その後は放出しません。<br/>
+		-1にすると無限に放出します。<br/>
+		爆発など使い捨てるものは0.1など一瞬に設定して、光など存在し続けるものは-1で無制限にしておきましょう。<br/>
+		<br/>
+		EmissionRate は一秒間にパーティクルを放出する数です。<br/>
+		一瞬でたくさん放出して消えるような爆発なら1000とか2000とかの数字に、<br/>
+		ゆっくり動いて消えてゆく煙なら10くらいにするとよいでしょう。<br/>
+		<br/>
+		lifetimeは放出されたパーティクルの生存時間です。3にすると、それぞれの粒子は放出後3秒して消えます。<br/>	<br/>
+	</p>	
+
+<h3>GravityとRadius</h3>
+
+<p>
+	cocos2dxのパーティクルはGravityとRadiusの2種類あります。<br/>
+	Motionパネルの中で、GとRキーで切り替えます。<br/>
+</p>
+
+<h3>Gravityタイプの編集</h3>
+
+<p>
+	Gravityは中心の四角形（あるいは点）から外側に飛び出すパーティクルです。<br/>
+	Mを押してMotionパネルを開き、Gを押してGravityタイプにします。<br/>
+			<img src="docimg/gravity.png" style="border-style: solid 1px;"/><br/>
+	<br/>
+	３つの四角い領域があります。その四角の中でマウスをドラッグすると、放出方向や早さが変わります。	<br/>
+	EmitAreaで指定した四角形の領域から、指定したAngle(角度)に向かって指定のspeedで飛び出したパーティクルは、<br/>
+	gravityの影響で放出後の動きが変わります。<br/>
+	<br/>
+	AngleVar（放出角度ばらつき）を180にすると爆発のように全方位に飛び散ります。0にするとローソクのように1方向に放出します。<br/>
+	迫力をつけるには、ここでSpeed、StartSizeを変更します。<br/>
+</p>
+
+<h3>Radiusタイプの編集</h3>
+
+<p>
+	MotionパネルでRを押してRadiusタイプにします。<br/>
+
+	<img src="docimg/radius.png" style="border-style: solid 1px;"/><br/>
+
+	編集のほとんどはGravityタイプと同じです。<br/>
+	Radiusはスライダーだけで編集します。スライダーに合わせて画面に半透明のガイドが出ます。<br/>
+	<br/>
+	まずMaxRadiusとMinRadiusで基準の円を決め、その後に、Rotateを決めるとよいでしょう。<br/>
+	Gravityと同じく、AngleVarを変えると1方向になったり全方向に飛び散ったりします。
+</p>
+
+<h3>高度な操作</h3>
+
+<p>
+	・動きをちょっと変えて見比べたいとき、D(Duplicate)キーを押すと、現在パーティクルを右上に複製できます。（複製のほうに制御が移ります）<br/>
+	   &nbsp;&nbsp; 複製されたものを少し変えて見比べ、いらなくなったらRemoveを押して消えましょう。<br/>
+	   <br/>
+	・編集中パーティクルを一時保存するときはSキーでSnapshotが取れます。画面写真ではなく、現在のパーティクス設定の一時保存です。<br/>
+	   &nbsp;&nbsp; 画面にS0,S1,S2とマークが出てくるので、それをクリックすると、保存時のパーティクルを呼び戻せます。<br/>
+	   <br/>
+	・花火を作る例。。Gravityを選び、AngleVarを180にして全方位に放出。<br/>
+	   &nbsp;&nbsp; durationを0.1にして一瞬で終了。emissionRateを500にして大量生成。このままでは。<br/>
+	   <br/>
+	   
+	
+	
+	
+</p>
+
+<h3>エクスポート</h3>
+
+<p>	
+	cocos2dxでパーティクルを使うには、plist方式でエクスポートします。<br/>
+	Pを押すと即時ダウンロードになります。<br/>
+		
+	<img src="docimg/inout.png" style="border-style: solid 1px;"/><br/>
+	
+	InOut全般の操作は、Iを押してInOutパネルを開きます。<br/>
+	<br/>
+	Exportの欄のPlistをクリックするとcocos2dxで使えるplistをダウンロードします。<br/>
+	この場合、テクスチャ画像はgzipした後
+	AllEmitterをクリックすると、編集中の全Emitterをjsonで出力します。<br/>
+	<br/>
+	Separated Exportの欄では、PlistとPNGを別にダウンロードできます。<br/>
+	PListとPNGを入れ込んだ場合、png画像は、gzip圧縮してbase64エンコードされた文字列としてtextureImageDataの欄に入ります。<br/>
+</p>
+
+<h3>インポート</h3>
+
+<p>	
+	このサイトから出力したPNG、あるいはParticleDesigner2で出力したPListを読み込めます。<br/>
+	ですが現状ファイルアップロードはないので、テキストとして読み込みます。<br/>
+	<br/>
+	
+	Iを押し「InOut」パネルを開きます。<br/>
+	Import欄に、Plistの入力用テキストボックスと、複数パーティクルをまとめたjsonの入力テキストボックスがあります。<br/>
+	<br/>
+	テキストエディタで開いたjsonやxmlを貼り付けて、Tabを押すと画面に読み込まれます。<br/>
+	plistを開いた時には現在のスロットで編集中のパーティクルが書き換わります。<br/>
+	複数パーティクルのjsonを開いた時には、編集中のパーティクルが全部消えてjsonの内容に入れ替わります。<br/>
+	
+</p>
+
+<h3>複数エミッタの編集</h3>
+
+<p>
+少し凝った演出だと、パーティクルを複数重ね合わせることがあります。<br/>
+大きなものと小さなもの、濃いものと薄いもの、早いものと遅いもの、を重ねます。<br/>
+
+A キーを押すとエミッタ2が追加され、炎のパーティクルが出てきます。<br/>
+何度も押すと次々エミッタが増えていきます。<br/>
+<br/>
+増えたエミッタは、数字キーで表示を管理できます。<br/>
+0を押すと全エミッタをoff。1-9でそれぞれのエミッタを選択し、表示させます。<br/>
+aaaaa012345 と押してみると感覚がつかめると思います。<br/>
+画面上のEmit1,Emit2のリンクをクリックすると選択、表示、off1,off2を選択すると非表示になります。<br/>
+<br/>
+Removeで不要なエミッタを削除します。<br/>
+RemoveOtherをクリックすると選択中以外の全エミッタを削除します。<br/>
+<br/>
+これらをcocos2dxから使うときには、一つづつPListに出力して呼び出す必要があります。<br/>
+</p>
+
+<h3>コード例</h3>
+
+<p>
+   JavaScript(アプリ)  * html5版はplistのpreloadが必要<br/>
+</p>
+		<div class="code">
+	        particle = cc.ParticleSystem.create("particle.plist");//plist読み込み<br/>
+			this.addChild(particle); //画面に追加<br/>
+		</div>
+<p>
+   C++<br/>
+</p>
+		<div class="code">
+			ParticleSystemQuad* particle = ParticleSystemQuad::create("particle.plist"); //plist読み込み<br/>
+			this->addChild(particle); //画面に追加<br/>
+		</div>
+<p>	
+   Lua<br/>
+</p>
+		<div class="code">
+        local particle = cc.ParticleSystemQuad:create("particle.plist");--plist読み込み<br/>
+        layerFarm:addChild(particle,10); --画面に追加<br/>
+		</div>
+
+
+<h3>ほか特徴</h3>
+
+<p>
+  ・リアルタイムPList更新<br/>
+  ・多くのテンプレート。ひながたパーティクルをワンクリックで呼び出し、自分好みに加工できます。<br/>
+  ・キーボードショートカット<br/>
+  ・WebベースなのでWindowsでもMacでも使えます<br/>
+  ・直感的マウス操作<br/>
+  ・複数エミッタ編集<br/>
+  ・制作中パーティクルをスナップショット保存＆呼び出し<br/>
+  ・Plist読み込み<br/>
+  ・ParticleDesigner互換のPlist出力<br/>
+</p>
+
+</body>
+</html>
