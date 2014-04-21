@@ -1,7 +1,8 @@
-<?
+<?php
 function strGray($str) { return "<span style='color:gray;'>".$str."</span>";}
-function gzdecode($data) {  return gzinflate(substr($data,10,-8)); } 
-
+if ( !function_exists("gzdecode") ) {
+    function gzdecode($data) {  return gzinflate(substr($data,10,-8)); } 
+}
 $ua=$_SERVER['HTTP_USER_AGENT'];
 $boxsize=200;
 
