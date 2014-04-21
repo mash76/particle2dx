@@ -596,13 +596,20 @@ function getP2dx(fname){
 //XML文書をjsのaryに
 function xml2ary(xml_str){
 
-	cc.log("xml2ary");
-
-	parser=new DOMParser();
-	xmlDoc = parser.parseFromString(xml_str, "text/xml");	
+    var xmlDoc = null;
+    
+    if ( typeof(xml_str) == "object" ) { // If xml_str is object then use directly
+        xmlDoc = xml_str;
+    } else {                             // Otherwise parse str
+        var parser = new DOMParser();
+        xmlDoc = parser.parseFromString(xml_str, "text/xml");   
+    }
+    
 	var plist = xmlDoc.documentElement;
+    
 	// Get first real node
     var node = null;
+    
     for (var i = 0, len = plist.childNodes.length; i < len; i++) {
         node = plist.childNodes[i];
         if (node.nodeType == 1)
