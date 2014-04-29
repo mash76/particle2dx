@@ -1,29 +1,39 @@
-<?
+<?php
 function strGray($str) { return "<span style='color:gray;'>".$str."</span>";}
-function gzdecode($data) {  return gzinflate(substr($data,10,-8)); } 
-
+if ( !function_exists("gzdecode") ) {
+    function gzdecode($data) {  return gzinflate(substr($data,10,-8)); } 
+}
 $ua=$_SERVER['HTTP_USER_AGENT'];
 $boxsize=200;
 
-if ($_REQUEST['type']=='png_dl64gz'){
-	header("Content-Type: image/png;");
-	header('Content-Disposition: Attachment; filename="'.$_REQUEST['png_filename'].'.png"');
-	echo gzdecode(base64_decode(urldecode($_REQUEST['png_dl64gz'])));
-	exit;
-}
+if (isset($_REQUEST['type'])) {
 
-if ($_REQUEST['type']=='p2dx_json' ){
-	header("Content-Type: text/json;");
-	header('Content-Disposition: Attachment; filename="file.alljson"');
-	echo  stripslashes($_REQUEST['p2dx_json']);
-	exit;
-}
-
-if ($_REQUEST['type']=='plist_xml'){
-	header("Content-Type: text/xml;");
-	header('Content-Disposition: Attachment; filename="'.$_REQUEST['png_filename'].'.plist"');
-	echo urldecode($_REQUEST['plist_xml']);
-	exit;
+    switch ( $_REQUEST['type'] ) {
+     
+        case "png_dl64gz":
+            header("Content-Type: image/png;");
+            header('Content-Disposition: Attachment; filename="'.$_REQUEST['png_filename'].'.png"');
+            echo gzdecode(base64_decode(urldecode($_REQUEST['png_dl64gz'])));
+            exit;
+        break;
+        
+        case "p2dx_json":
+            header("Content-Type: text/json;");
+            header('Content-Disposition: Attachment; filename="file.alljson"');
+            echo  stripslashes($_REQUEST['p2dx_json']);
+            exit;
+        break;
+        
+        default:
+        case "plist_xml":
+            header("Content-Type: text/xml;");
+            header('Content-Disposition: Attachment; filename="'.$_REQUEST['png_filename'].'.plist"');
+            echo urldecode($_REQUEST['plist_xml']);
+            exit;
+        break;
+        
+    }
+    
 }
 
 ?>
