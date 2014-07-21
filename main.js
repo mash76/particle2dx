@@ -1,29 +1,5 @@
-/****************************************************************************
- Copyright (c) 2010-2012 cocos2d-x.org
- Copyright (c) 2008-2010 Ricardo Quesada
- Copyright (c) 2011      Zynga Inc.
+//director=cc.Director.getInstance();
 
- http://www.cocos2d-x.org
-
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 var cocos2dApp = cc.Application.extend({
     config:document['ccConfig'],
     ctor:function (scene) {
@@ -46,35 +22,22 @@ var cocos2dApp = cc.Application.extend({
         var searchPaths = [];
         var resDirOrders = [];
 
-        searchPaths.push("res");
         cc.FileUtils.getInstance().setSearchPaths(searchPaths);
 
         var platform = cc.Application.getInstance().getTargetPlatform();
-        if (platform == cc.TARGET_PLATFORM.MOBILE_BROWSER) {
-            resDirOrders.push("HD");
-        }
-        else if (platform == cc.TARGET_PLATFORM.PC_BROWSER) {
-            if (screenSize.height >= 800) {
-                resDirOrders.push("HD");
-            }
-            else {
-                resourceSize = cc.size(320, 480);
-                designSize = cc.size(320, 480);
-                resDirOrders.push("Normal");
-            }
-        }
+        resourceSize = cc.size(320, 480);
+        designSize = cc.size(320, 480);
 
-        cc.FileUtils.getInstance().setSearchResolutionsOrder(resDirOrders);
         director.setContentScaleFactor(resourceSize.width / designSize.width);
         cc.EGLView.getInstance().setDesignResolutionSize(designSize.width, designSize.height, cc.RESOLUTION_POLICY.SHOW_ALL);
-        cc.EGLView.getInstance().resizeWithBrowserSize(true);
+        cc.EGLView.getInstance().resizeWithBrowserSize(false);//important
 
         //director.setDisplayStats(this.config['showFPS']);
 		director.setDisplayStats(false);
         director.setAnimationInterval(1.0 / this.config['frameRate']);
 
-        //load resources
-        cc.LoaderScene.preload(g_resources, function () {
+        //load resources  (empty)
+        cc.LoaderScene.preload([], function () {
             director.replaceScene(new this.startScene());
         }, this);
 
@@ -84,5 +47,4 @@ var cocos2dApp = cc.Application.extend({
 
 var myApp = new cocos2dApp(MyScene);
 
-//グローバルの変数
-director=cc.Director.getInstance();
+
