@@ -186,6 +186,8 @@ var MyScene = cc.Scene.extend({
     }
 });
 
+
+
 function round1(val1){
 	return parseInt(val1*10)/10;
 }
@@ -254,18 +256,25 @@ function dumpToInputTag(p_slot){
 		if (!p_slot) { p_slot=slot;}
 
 		$('#angle').val(parseInt(emitter[p_slot].getAngle()));		
-		$('#angle_var').val(parseInt(emitter[p_slot].getAngleVar()));	
+		$('#angle_text').val(parseInt(emitter[p_slot].getAngle()));		
+		$('#angle_var').val(parseInt(emitter[p_slot].getAngleVar()));
+		$('#angle_var_text').val(parseInt(emitter[p_slot].getAngleVar()));
+			
 		$('#angle_disp').html(emitter[p_slot].getAngle()+"±"+emitter[p_slot].getAngleVar());	
 		
-		$('#duration').val(emitter[p_slot].getDuration());		
+		$('#duration').val(emitter[p_slot].getDuration());
+		$('#duration_text').val(emitter[p_slot].getDuration());		
+		
 		$('#duration_disp').html(emitter[p_slot].getDuration());
 		$("#duration_forever_disp").html(" ");	
 		if (emitter[p_slot].getDuration()==-1){
 			$("#duration_forever_disp").html("<span style='color:red;' >forever</span>");	
 		}
 				
-		$('#life').val(emitter[p_slot].getLife());		
+		$('#life').val(emitter[p_slot].getLife());
+		$('#life_text').val(emitter[p_slot].getLife());		
 		$('#lifeVar').val(emitter[p_slot].getLifeVar());		
+		$('#lifeVar_text').val(emitter[p_slot].getLifeVar());
 		$('#life_disp').html(emitter[p_slot].getLife()+"±"+emitter[p_slot].getLifeVar());
 
 		//start
@@ -330,13 +339,15 @@ function dumpToInputTag(p_slot){
 		pos=emitter[p_slot].getPosition();
 		posvar=emitter[p_slot].getPosVar();
 		
-		$('#posx').val(pos.x);
-		$('#posy').val(pos.y);
-		$('#posx_var').val(posvar.x);
-		$('#posy_var').val(posvar.y);		
+		//$('#posx').val(pos.x);
+		//$('#posy').val(pos.y);
+		//$('#posx_var').val(posvar.x);
+		//$('#posy_var').val(posvar.y);		
 	
 		$('#pos_var_x').val(posvar.x);
+		$('#pos_var_x_text').val(posvar.x);
 		$('#pos_var_y').val(posvar.y);
+		$('#pos_var_y_text').val(posvar.y);
 		$('#pos_var_disp').html(parseInt(posvar.x)+"x"+parseInt(posvar.y));
 		
 	    if (emitter[p_slot].getEmitterMode()==cc.PARTICLE_MODE_GRAVITY){ 
@@ -345,23 +356,31 @@ function dumpToInputTag(p_slot){
 			$('#disp_speed').html(parseInt(emitter[p_slot].getSpeed()));
  
 			$('#speed').val(parseInt(emitter[p_slot].getSpeed()));
+			$('#speed_text').val(parseInt(emitter[p_slot].getSpeed()));
 			$('#speedVar').val(parseInt(emitter[p_slot].getSpeedVar()));
+			$('#speedVar_text').val(parseInt(emitter[p_slot].getSpeedVar()));
 			$('#speedVar_disp').html(emitter[p_slot].getSpeed()+"±"+emitter[p_slot].getSpeedVar());		
 
 			grv=emitter[p_slot].getGravity();
-			$('#grav_x').val(grv.x);
-			$('#grav_y').val(grv.y);
+			//$('#grav_x').val(grv.x);
+			//$('#grav_y').val(grv.y);
 
 			$('#gravity_x').val(grv.x);
+			$('#gravity_x_text').val(grv.x);
 			$('#gravity_y').val(grv.y);
+			$('#gravity_y_text').val(grv.y);
 			$('#gravity_disp').html(round1(grv.x)+"x"+round1(grv.y));
 			
 			$('#rad_accel').val(emitter[p_slot].getRadialAccel());
+			$('#rad_accel_text').val(emitter[p_slot].getRadialAccel());
 			$('#rad_accel_var').val(emitter[p_slot].getRadialAccelVar());		
+			$('#rad_accel_var_text').val(emitter[p_slot].getRadialAccelVar());
 			$('#rad_accel_disp').html(emitter[p_slot].getRadialAccel()+"±"+emitter[p_slot].getRadialAccelVar());
 
 			$('#tan_accel').val(emitter[p_slot].getTangentialAccel());
+			$('#tan_accel_text').val(emitter[p_slot].getTangentialAccel());
 			$('#tan_accel_var').val(emitter[p_slot].getTangentialAccelVar());		
+			$('#tan_accel_var_text').val(emitter[p_slot].getTangentialAccelVar());	
 			$('#tan_accel_disp').html(emitter[p_slot].getTangentialAccel()+"±"+emitter[p_slot].getTangentialAccelVar());
 
 		}else{
@@ -370,9 +389,16 @@ function dumpToInputTag(p_slot){
 			$('#maxRadius').val(emitter[p_slot].getStartRadius());		
 			$('#maxRadiusVar').val(emitter[p_slot].getStartRadiusVar());		
 			$('#minRadius').val(emitter[p_slot].getEndRadius());			
+			$('#maxRadius_text').val(emitter[p_slot].getStartRadius());		
+			$('#maxRadiusVar_text').val(emitter[p_slot].getStartRadiusVar());		
+			$('#minRadius_text').val(emitter[p_slot].getEndRadius());	
 	
 			$('#rotatePerSecond').val(emitter[p_slot].getRotatePerSecond());		
 			$('#rotatePerSecondVar').val(emitter[p_slot].getRotatePerSecondVar());	
+			$('#rotatePerSecond_text').val(emitter[p_slot].getRotatePerSecond());		
+			$('#rotatePerSecondVar_text').val(emitter[p_slot].getRotatePerSecondVar());	
+
+
 
 			$('#max_radius_disp').html(emitter[p_slot].getStartRadius()+"±"+emitter[p_slot].getStartRadiusVar());			
 			$('#min_radius_disp').html(emitter[p_slot].getEndRadius());			
@@ -381,7 +407,8 @@ function dumpToInputTag(p_slot){
 
 		$('#maxParticles').val(emitter[p_slot].getTotalParticles());	
 		$('#emissionRate').val(parseInt(emitter[p_slot].getEmissionRate()));	
-		
+		$('#emissionRate_text').val(parseInt(emitter[p_slot].getEmissionRate()));	
+				
 		//position
 		pos=emitter[p_slot].getPosition();
 		$('#emitter_posi').html(parseInt(pos.x)+" "+parseInt(pos.y));	

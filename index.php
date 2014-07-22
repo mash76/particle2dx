@@ -96,7 +96,7 @@ if (isset($_REQUEST['type'])) {
 <head>
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="description" content="ParticleEditor for Cocos2dx CoronaSDK WebBased. Win&Mac.">
+<meta name="description" content="OnlineParticleEditor for cocos2dx CoronaSDK Win&Mac">
 
 <meta property="og:title" content="Particle2dx" />
 <meta property="og:type" content="tool" />
@@ -604,9 +604,10 @@ $plist_64=base64_encode($plist_temp);
 	同じキー名のパーティクルを読み込むとテクスチャが上書き<br/>
 	<br/>
 -->
+
 </td><td style="vertical-align:top;">
 
-<div style="border-bottom:1px solid #444444;">
+<div style="border-bottom:1px solid #444444;  width:900; nowrap;">
 
 	<div id="slots">
 		** slots **
@@ -881,8 +882,9 @@ $plist_64=base64_encode($plist_temp);
 	   	   col_3b= cc.c3b(p_ary[0],p_ary[1],p_ary[2]);
 	   	   col_4f=cc.c4FFromccc3B(col_3b);
 	   	   emitter[slot].setStartColor(col_4f);
-	   	   current_start_color=emitter[slot].getStartColor();
 	   	   prev_string.setVisible(false);
+	   	   
+	   	   current_start_color=emitter[slot].getStartColor();
 	   	   //emitter からテキストボックスへ
 	   	   dumpToInputTag(slot);
 	   });
@@ -910,6 +912,7 @@ $plist_64=base64_encode($plist_temp);
 		updStartCol=function(){
 			emitter[slot].setStartColor(new cc.Color4F(parseFloat($("#start_r").val()),parseFloat($("#start_g").val()),parseFloat($("#start_b").val()),
 		   						parseFloat($("#start_a").val())));//r,g,b,a 
+		    current_start_color=emitter[slot].getStartColor();
 		};
 		updStartColVar=function(){
 			emitter[slot].setStartColorVar(new cc.Color4F(parseFloat($("#start_r_var").val()),parseFloat($("#start_g_var").val()),parseFloat($("#start_b_var").val()),
@@ -1139,7 +1142,7 @@ $plist_64=base64_encode($plist_temp);
 			</h4>
 		
 			<table >
-				<tr><td>
+				<tr><td width="100" >
 					Duration
 				</td><td width="80" >
 					<span id="duration_disp" >**</span> sec 
@@ -1150,6 +1153,12 @@ $plist_64=base64_encode($plist_temp);
 						emitter[slot].setDuration(parseFloat(this.value));
 						emitter[slot].resetSystem();
 						dumpToInputTag();" />
+					<input type="text" size="4" id="duration_text"name="duration_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
+							emitter[slot].setDuration(parseFloat(this.value));
+							emitter[slot].resetSystem();
+							dumpToInputTag(); " > 
 					<span id="duration_forever_disp" >**</span>
 					
 					<a  href="javascript:emitter[slot].setDuration(-1);   dumpToInputTag();">Forever</a>
@@ -1173,12 +1182,25 @@ $plist_64=base64_encode($plist_temp);
 								emitter[slot].setLife( parseFloat(this.value) );
 								emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate() * emitter[slot].getLife() ));
 								dumpToInputTag(slot); " />
+					<input type="text" size="4" id="life_text"name="life_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
+							emitter[slot].setLife(parseFloat(this.value));
+							emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate() * emitter[slot].getLife()));
+							dumpToInputTag(); " > 
 								
 					<input type="range" id="lifeVar" name="lifeVar" min="0" max="10" step="0.1"
 							onMouseMove="
 								if (!flg_mousedown) return;
 								emitter[slot].setLifeVar(parseFloat(this.value));
 								dumpToInputTag(slot); " />
+	
+					<input type="text" size="4" id="lifeVar_text"name="lifeVar_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
+							emitter[slot].setLifeVar(parseFloat(this.value));
+							dumpToInputTag(); " > 
+	
 								
 				</td></tr>	
 				<tr><td>
@@ -1189,8 +1211,15 @@ $plist_64=base64_encode($plist_temp);
 				<input id="emissionRate" name="emissionRate" type="range" min="1" max="800" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setEmissionRate(parseInt(this.value));																										emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate()*emitter[slot].getLife()));
+					emitter[slot].setEmissionRate(parseInt(this.value));																								emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate()*emitter[slot].getLife()));
 					dumpToInputTag(slot);"/>
+					
+				<input type="text" size="4" id="emissionRate_text" name="emissionRate_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 					
+						emitter[slot].setEmissionRate(parseInt(this.value));																								emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate()*emitter[slot].getLife()));
+						dumpToInputTag(slot);"/>
+					
 				</td></tr>
 				<tr><td>				
 						Angle 
@@ -1205,6 +1234,13 @@ $plist_64=base64_encode($plist_temp);
 										guiderect[slot].setVisible(true);   
 										drawAngle(slot ,emitter[slot].getAngle(),emitter[slot].getSpeed()); 
 										dumpToInputTag(slot); "/>
+
+							<input type="text" size="4" id="angle_text" name="angle_text" 
+								onChange="
+									if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 					
+									emitter[slot].setAngle(parseInt(this.value));												
+									dumpToInputTag(slot);"/>
+									
 							<input id="angle_var" type="range" guide="1" min="0" max="180" step="1"
 								onMouseMove="
 										if (!flg_mousedown) return;
@@ -1213,237 +1249,249 @@ $plist_64=base64_encode($plist_temp);
 										guiderect[slot].setVisible(true);
 										drawAngle(slot,emitter[slot].getAngle(),emitter[slot].getSpeed()); 
 										dumpToInputTag(slot);"/>
+
+							<input type="text" size="4" id="angle_var_text" name="angle_var_text" 
+								onChange="
+									if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 					
+									emitter[slot].setAngleVar(parseInt(this.value));												
+									dumpToInputTag(slot);"/>
+
 				</td></tr>				
 			</table>	
 		</div>
 
 		<div id="pane_gravity">
 		
-		<table><tr><td style="vertical-align:top;" >
-				Angle 
-				<span id="disp_angle">**</span> Speed <span id="disp_speed">**</span><br/>		
-				<canvas id="cv_angle" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
-				</canvas>
-
+			<div style="border-bottom:1px solid #444444;" >
 			
-			<script>
-				var angle_x=0,angle_y=0,angle_flag=0;
-
-			    var cv_angle = document.getElementById('cv_angle');
-			    var ctx_angle = cv_angle.getContext('2d');
-					cv_angle.setAttribute("width", boxsize);
-					cv_angle.setAttribute("height",boxsize);
-					ctx_angle.scale( 1,1 );	
-								    
-				function drawAngle(p_slot,kakudo,speed){
-
-					kakudo=parseInt(kakudo);
-					speed=parseInt(speed);
-
-					clog("drawAngle p_slot:"+p_slot+ " emitters:"+emitter.length + " angle:" + kakudo + " speed:" + speed);
-					
-					this.rad=parseFloat(kakudo * Math.PI / 180 );
-
-					//線を引く
-					ctx_angle.clearRect(0,0,boxsize,boxsize);				
-					
-					to_x=boxsize/2 + Math.cos(this.rad) * speed / 10;
-					to_y=boxsize/2 - Math.sin(this.rad) * speed / 10;
-					//speed,angle
-					ctx_angle.beginPath();
-					ctx_angle.strokeStyle=' rgb(255,88,88) ';
-					ctx_angle.moveTo(boxsize/2,boxsize/2);
-					ctx_angle.lineTo(to_x , to_y);
-					ctx_angle.closePath();
-					ctx_angle.stroke();
-					
-					//angleVarの円弧
-					ctx_angle.beginPath();
-					anglevar=parseInt(emitter[p_slot].getAngleVar());
-					rad_from = round2((kakudo - anglevar) * Math.PI / 180 * -1);
-					rad_to = round2((kakudo + anglevar) * Math.PI / 180 * -1);
-					clog(" kakudo:"+kakudo+" anglevar:"+anglevar+" radian from:"+rad_from+" to:"+rad_to);
-					ctx_angle.arc(boxsize/2, boxsize/2, 30,rad_from,rad_to, true); // x , y , 半径 , 開始度ラジアン , 終了度ラジアン , true
-					ctx_angle.stroke();
-					
-					//speedVar
-					this.spdVar=emitter[p_slot].getSpeedVar();
-					ctx_angle.beginPath();
-					ctx_angle.strokeStyle=' rgb(150,150,150) ';
-					ctx_angle.moveTo(to_x - Math.cos(this.rad) * this.spdVar / 10 + Math.sin(this.rad) *3, to_y + Math.sin(this.rad) * this.spdVar / 10 + Math.cos(this.rad) *3);
-					ctx_angle.lineTo(to_x + Math.cos(this.rad) * this.spdVar / 10 + Math.sin(this.rad) *3, to_y - Math.sin(this.rad) * this.spdVar / 10 + Math.cos(this.rad) *3);
-					ctx_angle.closePath();					
-
-					ctx_angle.stroke();
-				}
-				
-				$("#cv_angle").bind("mousedown",function(e){
-					angle_flag=1;
-				});
-				$("#cv_angle").bind("mousemove",function(e){
-					if (angle_flag==0) { return; }
-					off=$("#cv_angle").offset();
-					rect = e.target.getBoundingClientRect();
-					
-                	angle_x = e.clientX - rect.left - boxsize/2;
-					angle_y = e.clientY - rect.top  - boxsize/2;
-
-					angle_x=Math.floor(angle_x * 10);
-					angle_y=Math.floor(angle_y * 10);
-
-					kakudo = Math.floor(Math.atan2(angle_y,angle_x) * 180 / Math.PI ) * -1;
-					speed  = Math.floor(Math.sqrt(angle_x * angle_x + angle_y * angle_y));
-					clog ("speed:"+ speed);
-
-					emitter[slot].setSpeed(speed);
-					emitter[slot].setAngle(kakudo);
-					$("#speed").attr("value",speed);
-					dumpToInputTag(slot);
-				});
-				$("#cv_angle").bind("mouseup",function(e){
-					angle_flag=0;
-					dumpToInputTag(slot);
-				});
-			</script>
-			<br/>
-
-
-		</td><td style="vertical-align:top;">
-
-			EmitArea <span id="emit_area">** x **</span><br/>
-			<canvas id="set_pos" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
-			</canvas>
-			<br/>
-			<a href="javascript:emitter[slot].setPosVar(cc.p(0,0));     dumpToInputTag(slot);">0x0</a>
-			<a href="javascript:emitter[slot].setPosVar(cc.p(160,5));   dumpToInputTag(slot);">Hor</a>			
-			<a href="javascript:emitter[slot].setPosVar(cc.p(5,240));   dumpToInputTag(slot);">Ver</a>						
-			<a href="javascript:emitter[slot].setPosVar(cc.p(160,240)); dumpToInputTag(slot);">320x480</a>
-			
-			<script>
-				var emit_x=0,emit_y=0,emit_flag=0;
-
-			    var cv = document.getElementById('set_pos');
-			    var emit_ctx = cv.getContext('2d');
-					cv.setAttribute("width", boxsize);
-					cv.setAttribute("height",boxsize);
-					emit_ctx.scale( 1,1 );	
-			    
-				function drawEmitArea(p_slot,xx,yy){
-
-					xx=Math.floor(xx);
-					yy=Math.floor(yy);
-					$("#emit_area").html(" " +  Math.abs(xx *2) + " " + Math.abs(yy *2)  ); //プラスマイナスつくので2倍サイズ
-					guiderect[p_slot].setScaleX(xx *2 / 100);
-					guiderect[p_slot].setScaleY(yy *2 / 100);
-
-					//四角を描く
-					emit_ctx.clearRect(0,0,boxsize,boxsize);				
-					emit_ctx.beginPath();
-					emit_ctx.strokeStyle=' rgb(255,88,88) ';
-					emit_ctx.strokeRect(boxsize/2 - Math.floor( xx/5  ) , boxsize/2 - Math.floor(yy / 5 ),  Math.floor(xx/5) * 2 ,  Math.floor(yy / 5) *2 );
-					emit_ctx.closePath();
-					emit_ctx.stroke();
-				}
-				
-				$("#set_pos").bind("mousedown",function(e){
-					emit_flag=1;
-					guiderect[slot].setVisible(true);
-				});
-				$("#set_pos").bind("mousemove",function(e){
-					if (emit_flag==0) { return; }
-					off=$("#set_pos").offset();
-					
-					rect = e.target.getBoundingClientRect();
-                	emit_x = Math.abs(e.clientX - rect.left - boxsize/2) * 5;
-					emit_y = Math.abs(e.clientY - rect.top  - boxsize/2) * 5;					
-
-					emitter[slot].setPosVar(cc.p( parseInt(emit_x)  , parseInt(emit_y) ));
-					drawEmitArea( slot , emit_x , emit_y );
-					dumpToInputTag(slot);
-				});
-				$("#set_pos").bind("mouseup",function(e){
-					emit_flag=0;
-					guiderect[slot].setVisible(false);
-					dumpToInputTag(slot);
-				});
-			</script>
-
-		</td><td style="vertical-align:top;">
-		
-			Gravity <span id="grav_01">** x **</span><br/>
-			<canvas id="grav_pad" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
-			</canvas>
-			<script>
-			    var cv_grav = document.getElementById('grav_pad');
-			    var ctx_grav = cv_grav.getContext('2d');
-				var grav_x=0,grav_y=0,grav_flag=0;
-					cv_grav.setAttribute("width", boxsize);
-					cv_grav.setAttribute("height",boxsize);
-					ctx_grav.scale( 1,1 );
-				
-				function drawGrav(p_slot,xx,yy){
-					xx=Math.floor(xx);
-					yy=Math.floor(yy);
-					$("#grav_01").html(" " + xx + " " + yy );
-					
-					emitter[p_slot].setGravity(cc.p( xx , yy ));
-					
-					//中心から線を引く
-					ctx_grav.clearRect(0,0,boxsize,boxsize);				
-					ctx_grav.beginPath();
-					ctx_grav.strokeStyle=' rgb(255,88,88) ';
-					ctx_grav.moveTo(boxsize/2,boxsize/2);
-					ctx_grav.lineTo(boxsize/2+ xx/20 , boxsize/2 - yy / 20);
-					ctx_grav.closePath();
-					ctx_grav.stroke();
-				}
-				$("#grav_pad").bind("mousedown",function(e){
-					grav_flag=1;
-				});
-				$("#grav_pad").bind("mousemove",function(e){
-					if (grav_flag==0) { return; }
-					off=$("#grav_pad").offset();
-					
-					rect = e.target.getBoundingClientRect();
-                	grav_x = (e.clientX - rect.left - boxsize/2) ;
-					grav_y = (e.clientY - rect.top  - boxsize/2) * -1;					
-					
-					drawGrav(slot,grav_x*20,grav_y*20);
-					dumpToInputTag(slot);
-				});
-				
-				$("#grav_pad").bind("mouseup",function(e){
-					grav_flag=0;
-					dumpToInputTag(slot);
-				});
-			</script>
-			<br/>			
-			<a href="javascript:drawGrav(slot,0,0);dumpToInputTag(slot);">OFF</a> 
-			<a href="javascript:drawGrav(slot,emitter[slot].getGravity().x * 0.8,emitter[slot].getGravity().y * 0.8);  dumpToInputTag(slot);">80%</a> 
-			<a href="javascript:drawGrav(slot,emitter[slot].getGravity().x * 1.2,emitter[slot].getGravity().y * 1.2);  dumpToInputTag(slot);">120%</a> 
-	</td></tr></table>
+			<table ><tr><td style="vertical-align:top;" >
+					Angle 
+					<span id="disp_angle">**</span> Speed <span id="disp_speed">**</span><br/>		
+					<canvas id="cv_angle" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
+					</canvas>
 	
-	<div style="margin:5px;">
-	Speed 
-	<a  href="javascript:emitter[slot].setSpeed(emitter[slot].getSpeed()*2); 
-															emitter[slot].setRadialAccel(emitter[slot].getRadialAccel()*2);     
-															emitter[slot].setTangentialAccel(emitter[slot].getTangentialAccel()*2);    
-															dumpToInputTag(slot);">x2</a> 	
-	<a  href="javascript:emitter[slot].setSpeed(emitter[slot].getSpeed()/2); 
-															emitter[slot].setRadialAccel(emitter[slot].getRadialAccel()/2);     
-															emitter[slot].setTangentialAccel(emitter[slot].getTangentialAccel()/2);    
-															dumpToInputTag(slot);">/2</a>		
-    &nbsp;&nbsp;				
-
-	Rotate
-	<a href="javascript:rotateSlot(slot,10)">10</a>
-	<a href="javascript:rotateSlot(slot,90)">90</a>			
-	</div>
+				
+				<script>
+					var angle_x=0,angle_y=0,angle_flag=0;
+	
+				    var cv_angle = document.getElementById('cv_angle');
+				    var ctx_angle = cv_angle.getContext('2d');
+						cv_angle.setAttribute("width", boxsize);
+						cv_angle.setAttribute("height",boxsize);
+						ctx_angle.scale( 1,1 );	
+									    
+					function drawAngle(p_slot,kakudo,speed){
+	
+						kakudo=parseInt(kakudo);
+						speed=parseInt(speed);
+	
+						clog("drawAngle p_slot:"+p_slot+ " emitters:"+emitter.length + " angle:" + kakudo + " speed:" + speed);
+						
+						this.rad=parseFloat(kakudo * Math.PI / 180 );
+	
+						//線を引く
+						ctx_angle.clearRect(0,0,boxsize,boxsize);				
+						
+						to_x=boxsize/2 + Math.cos(this.rad) * speed / 10;
+						to_y=boxsize/2 - Math.sin(this.rad) * speed / 10;
+						//speed,angle
+						ctx_angle.beginPath();
+						ctx_angle.strokeStyle=' rgb(255,88,88) ';
+						ctx_angle.moveTo(boxsize/2,boxsize/2);
+						ctx_angle.lineTo(to_x , to_y);
+						ctx_angle.closePath();
+						ctx_angle.stroke();
+						
+						//angleVarの円弧
+						ctx_angle.beginPath();
+						anglevar=parseInt(emitter[p_slot].getAngleVar());
+						rad_from = round2((kakudo - anglevar) * Math.PI / 180 * -1);
+						rad_to = round2((kakudo + anglevar) * Math.PI / 180 * -1);
+						clog(" kakudo:"+kakudo+" anglevar:"+anglevar+" radian from:"+rad_from+" to:"+rad_to);
+						ctx_angle.arc(boxsize/2, boxsize/2, 30,rad_from,rad_to, true); // x , y , 半径 , 開始度ラジアン , 終了度ラジアン , true
+						ctx_angle.stroke();
+						
+						//speedVar
+						this.spdVar=emitter[p_slot].getSpeedVar();
+						ctx_angle.beginPath();
+						ctx_angle.strokeStyle=' rgb(150,150,150) ';
+						ctx_angle.moveTo(to_x - Math.cos(this.rad) * this.spdVar / 10 + Math.sin(this.rad) *3, to_y + Math.sin(this.rad) * this.spdVar / 10 + Math.cos(this.rad) *3);
+						ctx_angle.lineTo(to_x + Math.cos(this.rad) * this.spdVar / 10 + Math.sin(this.rad) *3, to_y - Math.sin(this.rad) * this.spdVar / 10 + Math.cos(this.rad) *3);
+						ctx_angle.closePath();					
+	
+						ctx_angle.stroke();
+					}
+					
+					$("#cv_angle").bind("mousedown",function(e){
+						angle_flag=1;
+					});
+					$("#cv_angle").bind("mousemove",function(e){
+						if (angle_flag==0) { return; }
+						off=$("#cv_angle").offset();
+						rect = e.target.getBoundingClientRect();
+						
+	                	angle_x = e.clientX - rect.left - boxsize/2;
+						angle_y = e.clientY - rect.top  - boxsize/2;
+	
+						angle_x=Math.floor(angle_x * 10);
+						angle_y=Math.floor(angle_y * 10);
+	
+						kakudo = Math.floor(Math.atan2(angle_y,angle_x) * 180 / Math.PI ) * -1;
+						speed  = Math.floor(Math.sqrt(angle_x * angle_x + angle_y * angle_y));
+						clog ("speed:"+ speed);
+	
+						emitter[slot].setSpeed(speed);
+						emitter[slot].setAngle(kakudo);
+						$("#speed").attr("value",speed);
+						dumpToInputTag(slot);
+					});
+					$("#cv_angle").bind("mouseup",function(e){
+						angle_flag=0;
+						dumpToInputTag(slot);
+					});
+				</script>
+				<br/>
+	
+				<div >
+				Speed 
+				<a  href="javascript:emitter[slot].setSpeed(emitter[slot].getSpeed()*2); 
+																		emitter[slot].setRadialAccel(emitter[slot].getRadialAccel()*2);     
+																		emitter[slot].setTangentialAccel(emitter[slot].getTangentialAccel()*2);    
+																		dumpToInputTag(slot);">x2</a> 	
+				<a  href="javascript:emitter[slot].setSpeed(emitter[slot].getSpeed()/2); 
+																		emitter[slot].setRadialAccel(emitter[slot].getRadialAccel()/2);     
+																		emitter[slot].setTangentialAccel(emitter[slot].getTangentialAccel()/2);    
+																		dumpToInputTag(slot);">/2</a>		
+			    &nbsp;&nbsp;				
 			
-	<table><tr><td>
+				Rotate
+				<a href="javascript:rotateSlot(slot,10)">10</a>
+				<a href="javascript:rotateSlot(slot,90)">90</a>			
+				</div>
+	
+	
+			</td><td style="vertical-align:top;">
+	
+				EmitArea <span id="emit_area">** x **</span><br/>
+				<canvas id="set_pos" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
+				</canvas>
+				<br/>
+				<a href="javascript:emitter[slot].setPosVar(cc.p(0,0));     dumpToInputTag(slot);">0x0</a>
+				<a href="javascript:emitter[slot].setPosVar(cc.p(160,5));   dumpToInputTag(slot);">Hor</a>			
+				<a href="javascript:emitter[slot].setPosVar(cc.p(5,240));   dumpToInputTag(slot);">Ver</a>						
+				<a href="javascript:emitter[slot].setPosVar(cc.p(160,240)); dumpToInputTag(slot);">320x480</a>
+				
+				<script>
+					var emit_x=0,emit_y=0,emit_flag=0;
+	
+				    var cv = document.getElementById('set_pos');
+				    var emit_ctx = cv.getContext('2d');
+						cv.setAttribute("width", boxsize);
+						cv.setAttribute("height",boxsize);
+						emit_ctx.scale( 1,1 );	
+				    
+					function drawEmitArea(p_slot,xx,yy){
+	
+						xx=Math.floor(xx);
+						yy=Math.floor(yy);
+						$("#emit_area").html(" " +  Math.abs(xx *2) + " " + Math.abs(yy *2)  ); //プラスマイナスつくので2倍サイズ
+						guiderect[p_slot].setScaleX(xx *2 / 100);
+						guiderect[p_slot].setScaleY(yy *2 / 100);
+	
+						//四角を描く
+						emit_ctx.clearRect(0,0,boxsize,boxsize);				
+						emit_ctx.beginPath();
+						emit_ctx.strokeStyle=' rgb(255,88,88) ';
+						emit_ctx.strokeRect(boxsize/2 - Math.floor( xx/5  ) , boxsize/2 - Math.floor(yy / 5 ),  Math.floor(xx/5) * 2 ,  Math.floor(yy / 5) *2 );
+						emit_ctx.closePath();
+						emit_ctx.stroke();
+					}
+					
+					$("#set_pos").bind("mousedown",function(e){
+						emit_flag=1;
+						guiderect[slot].setVisible(true);
+					});
+					$("#set_pos").bind("mousemove",function(e){
+						if (emit_flag==0) { return; }
+						off=$("#set_pos").offset();
+						
+						rect = e.target.getBoundingClientRect();
+	                	emit_x = Math.abs(e.clientX - rect.left - boxsize/2) * 5;
+						emit_y = Math.abs(e.clientY - rect.top  - boxsize/2) * 5;					
+	
+						emitter[slot].setPosVar(cc.p( parseInt(emit_x)  , parseInt(emit_y) ));
+						drawEmitArea( slot , emit_x , emit_y );
+						dumpToInputTag(slot);
+					});
+					$("#set_pos").bind("mouseup",function(e){
+						emit_flag=0;
+						guiderect[slot].setVisible(false);
+						dumpToInputTag(slot);
+					});
+				</script>
+	
+			</td><td style="vertical-align:top;">
+			
+				Gravity <span id="grav_01">** x **</span><br/>
+				<canvas id="grav_pad" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
+				</canvas>
+				<script>
+				    var cv_grav = document.getElementById('grav_pad');
+				    var ctx_grav = cv_grav.getContext('2d');
+					var grav_x=0,grav_y=0,grav_flag=0;
+						cv_grav.setAttribute("width", boxsize);
+						cv_grav.setAttribute("height",boxsize);
+						ctx_grav.scale( 1,1 );
+					
+					function drawGrav(p_slot,xx,yy){
+						xx=Math.floor(xx);
+						yy=Math.floor(yy);
+						$("#grav_01").html(" " + xx + " " + yy );
+						
+						emitter[p_slot].setGravity(cc.p( xx , yy ));
+						
+						//中心から線を引く
+						ctx_grav.clearRect(0,0,boxsize,boxsize);				
+						ctx_grav.beginPath();
+						ctx_grav.strokeStyle=' rgb(255,88,88) ';
+						ctx_grav.moveTo(boxsize/2,boxsize/2);
+						ctx_grav.lineTo(boxsize/2+ xx/20 , boxsize/2 - yy / 20);
+						ctx_grav.closePath();
+						ctx_grav.stroke();
+					}
+					$("#grav_pad").bind("mousedown",function(e){
+						grav_flag=1;
+					});
+					$("#grav_pad").bind("mousemove",function(e){
+						if (grav_flag==0) { return; }
+						off=$("#grav_pad").offset();
+						
+						rect = e.target.getBoundingClientRect();
+	                	grav_x = (e.clientX - rect.left - boxsize/2) ;
+						grav_y = (e.clientY - rect.top  - boxsize/2) * -1;					
+						
+						drawGrav(slot,grav_x*20,grav_y*20);
+						dumpToInputTag(slot);
+					});
+					
+					$("#grav_pad").bind("mouseup",function(e){
+						grav_flag=0;
+						dumpToInputTag(slot);
+					});
+				</script>
+				<br/>			
+				<a href="javascript:drawGrav(slot,0,0);dumpToInputTag(slot);">OFF</a> 
+				<a href="javascript:drawGrav(slot,emitter[slot].getGravity().x * 0.8,emitter[slot].getGravity().y * 0.8);  dumpToInputTag(slot);">80%</a> 
+				<a href="javascript:drawGrav(slot,emitter[slot].getGravity().x * 1.2,emitter[slot].getGravity().y * 1.2);  dumpToInputTag(slot);">120%</a> 
+		</td></tr></table>
+		
+			</div>
+
+			
+
 		
 		<table>
-			<tr><td>
+			<tr><td width="100">
 				Speed 
 			</td><td width="80" >
 				<span id="speedVar_disp" >**</span>			
@@ -1453,11 +1501,26 @@ $plist_64=base64_encode($plist_temp);
 					if (!flg_mousedown) return;
 					emitter[slot].setSpeed(parseFloat(this.value));
 					dumpToInputTag(slot);" />
+
+					<input type="text" size="4" id="speed_text"name="speed_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setSpeed(parseFloat(this.value));
+							dumpToInputTag(); "> 
+
+
 				<input type="range" id="speedVar" name="speedVar" guide="1" min="0" max="600" 
 				onMouseMove="
 					if (!flg_mousedown) return;
 					emitter[slot].setSpeedVar(parseFloat(this.value));
 					dumpToInputTag(slot);" />
+
+					<input type="text" size="4" id="speedVar_text"name="speedVar_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setSpeedVar(parseFloat(this.value));
+							dumpToInputTag(); "> 
+
 			</td></tr>
 			
 			<tr><td>
@@ -1473,6 +1536,13 @@ $plist_64=base64_encode($plist_temp);
 				   		setGuideObj(slot);
 						guiderect[slot].setVisible(true); 
 						dumpToInputTag(slot);"/>
+						
+				<input type="text" size="4" id="pos_var_x_text"name="pos_var_x_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+						emitter[slot].setPosVar(cc.p(parseInt(this.value),parseInt(emitter[slot].getPosVar().y)));
+						dumpToInputTag(); "> 
+						
 				<input id="pos_var_y" name="pos_var_y" type="range" guide="1" min="0" max="800"
 				 onMouseMove="
 						if (!flg_mousedown) return;
@@ -1480,10 +1550,17 @@ $plist_64=base64_encode($plist_temp);
 						setGuideObj(slot);
 						guiderect[slot].setVisible(true); 
 						dumpToInputTag(slot);"/>
+						
+				<input type="text" size="4" id="pos_var_y_text"name="pos_var_y_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+						emitter[slot].setPosVar(cc.p(parseInt(emitter[slot].getPosVar().x),parseInt(this.value)));
+						dumpToInputTag(); "> 			
+					
 			</td></tr>			
 			
 			<tr><td>
-				Gravity
+				GravityXY
 			</td><td>
 				<span id="gravity_disp" >**</span>
 			</td><td>
@@ -1493,16 +1570,26 @@ $plist_64=base64_encode($plist_temp);
 									if (!flg_mousedown) return;
 									emitter[slot].setGravity(cc.p(this.value,emitter[slot].getGravity().y)); 
 								    dumpToInputTag(slot);"/>
+								    
+				<input type="text" size="4" id="gravity_x_text"name="gravity_x_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
+						emitter[slot].setGravity(cc.p(this.value,emitter[slot].getGravity().y)); 
+						dumpToInputTag(); " > 					    
+								    
 				<input id="gravity_y" name="gravity_y" type="range" guide="1" min="-1200" max="1200" 
 								onMouseMove="
 									if (!flg_mousedown) return;
 									emitter[slot].setGravity(cc.p(emitter[slot].getGravity().x,this.value));
 								    dumpToInputTag(slot);"/>
-			</td></tr>			
-		</table>
 
-	</td><td style="vertical-align:top;" >
-		<table >
+				<input type="text" size="4" id="gravity_y_text"name="gravity_y_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
+						emitter[slot].setGravity(cc.p(emitter[slot].getGravity().x , this.value)); 
+						dumpToInputTag(); " > 
+
+			</td></tr>			
 				<tr><td>	 
 						AccelRad  
 				</td><td>		
@@ -1513,11 +1600,26 @@ $plist_64=base64_encode($plist_temp);
 							if (!flg_mousedown) return;
 							emitter[slot].setRadialAccel(parseFloat(this.value)); 
 							dumpToInputTag(slot); " />
+							
+						<input type="text" size="4" id="rad_accel_text"name="rad_accel_text" 
+							onChange="
+								if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+								emitter[slot].setRadialAccel(parseFloat(this.value)); 
+								dumpToInputTag(); "> 			
+					
+												
 						 <input type="range" id="rad_accel_var" name="rad_accel_var" min="0" max="600" 
 						  	onMouseMove="
 						  		if (!flg_mousedown) return;
 								emitter[slot].setRadialAccelVar(parseFloat(this.value)); 
 								dumpToInputTag(slot);" />
+								
+						<input type="text" size="4" id="rad_accel_var_text"name="rad_accel_var_text" 
+							onChange="
+								if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+								emitter[slot].setRadialAccelVar(parseFloat(this.value)); 
+								dumpToInputTag(); "> 										
+								
 				</td></tr>
 				<tr><td>			
 						AccelTan 	
@@ -1529,20 +1631,33 @@ $plist_64=base64_encode($plist_temp);
 							if (!flg_mousedown) return;
 							emitter[slot].setTangentialAccel(parseFloat(this.value)); 
 							dumpToInputTag(slot); " />
-						
+
+					<input type="text" size="4" id="tan_accel_text" name="tan_accel_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setTangentialAccel(parseFloat(this.value)); 
+							dumpToInputTag(); "> 	
+	
 					 <input type="range" id="tan_accel_var" name="tan_accel_var" min="0" max="600" 
 						 onMouseMove="
 						 	if (!flg_mousedown) return;
 						 	emitter[slot].setTangentialAccelVar(parseFloat(this.value)); 
 						 	dumpToInputTag(slot);" /> 	
+
+					<input type="text" size="4" id="tan_accel_var_text" name="tan_accel_var_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setTangentialAccelVar(parseFloat(this.value)); 
+							dumpToInputTag(); "> 	
+
 				</td></tr>
-			</table>	
-	</td></tr></table>				 		
+			</table>
+			 		
 	</div><!-- pane_gravity -->
 
 	<div id="pane_radius" style="display:none;">
 			
-			<table><tr><td>
+			<table><tr><td width="100">
 					MaxRadius 
 			</td><td width="80" >
 				<span id="max_radius_disp">**</span>
@@ -1554,6 +1669,14 @@ $plist_64=base64_encode($plist_temp);
 						setGuideObj(slot);
 						guiderect[slot].setVisible(true); 
 						dumpToInputTag(slot);" />
+						
+					<input type="text" size="4" id="maxRadius_text"name="maxRadius_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setStartRadius(parseFloat(this.value)); 
+							dumpToInputTag(); "> 
+						
+						
 					<input type="range" id="maxRadiusVar" name="maxRadiusVar" guide="1" min="0" max="1000" 
 					onMouseMove="
 						if (!flg_mousedown) return;
@@ -1561,7 +1684,14 @@ $plist_64=base64_encode($plist_temp);
 						setGuideObj(slot);
 						guiderect[slot].setVisible(true); 
 						dumpToInputTag(slot);" 
-					/><?=strGray("発生位置:px"); ?>		
+					/>	
+					
+					<input type="text" size="4" id="maxRadiusVar_text"name="maxRadiusVar_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setStartRadiusVar(parseFloat(this.value)); 
+							dumpToInputTag(); "> 					
+					<?=strGray("発生位置:px"); ?>	
 			</td></tr>			
 			<tr><td>
 					MinRadius 
@@ -1574,7 +1704,14 @@ $plist_64=base64_encode($plist_temp);
 							emitter[slot].setEndRadius(parseFloat(this.value)); 
 							setGuideObj(slot);
 							guiderect[slot].setVisible(true); 
-							dumpToInputTag(slot);" /><?=strGray("終了位置:px"); ?>
+							dumpToInputTag(slot);" />
+							
+					<input type="text" size="4" id="minRadius_text" name="minRadius_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setEndRadius(parseFloat(this.value)); 
+							dumpToInputTag(); "> 	
+							<?=strGray("終了位置:px"); ?>
 			</td></tr>
 			<tr><td>
 					Rotate/Sec
@@ -1587,12 +1724,29 @@ $plist_64=base64_encode($plist_temp);
 					 	emitter[slot].setRotatePerSecond(parseFloat(this.value)); 
 					 	dumpToInputTag(slot);
 					 	guiderect[slot].setVisible(true); "/>
+
+					<input type="text" size="4" id="rotatePerSecond_text" name="rotatePerSecond_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setRotatePerSecond(parseFloat(this.value)); 
+							dumpToInputTag(); "> 	
+
+					 	
 					 <input type="range" id="rotatePerSecondVar" name="rotatePerSecondVar" guide="1" min="0" max="1000"           
 					 onMouseMove="
 					 	if (!flg_mousedown) return;
 					 	emitter[slot].setRotatePerSecondVar(parseFloat(this.value)); 
 					 	dumpToInputTag(slot);
-					 	guiderect[slot].setVisible(true); "  /><?=strGray("円周に沿った回転量"); ?>
+					 	guiderect[slot].setVisible(true); "  />
+
+					<input type="text" size="4" id="rotatePerSecondVar_text" name="rotatePerSecondVar_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setRotatePerSecondVar(parseFloat(this.value)); 
+							dumpToInputTag(); "> 	<?=strGray("円周に沿った回転量"); ?>
+
+					 	
+
 			</td></tr>
 			</table>
 
