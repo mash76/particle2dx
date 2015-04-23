@@ -1,4 +1,4 @@
-<?
+<?php
 function strGray($str) { return "<span style='color:gray;'>".$str."</span>";}
 if ( !function_exists("gzdecode") ) {
     function gzdecode($data) {  return gzinflate(substr($data,10,-8)); } 
@@ -108,7 +108,7 @@ if (isset($_REQUEST['type'])) {
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
-	boxsize=<?=$boxsize?>;
+	boxsize=<?php echo $boxsize ?>;
 </script>
 <title>Particle2dx</title>
 <style>
@@ -118,12 +118,12 @@ if (isset($_REQUEST['type'])) {
 		font-size:80%;
 		background-color:#222222;	
 	}
-	<? if (preg_match("/chrome/i",$ua)) {?>
+	<?php if (preg_match("/chrome/i",$ua)) {?>
 	input{
 		background-color:#dddddd;
 		opacity:0.7;	
 	}
-	<? } ?>
+	<?php } ?>
 	h3{
 		color:white;
 		border-bottom:1px solid #444444;
@@ -162,7 +162,7 @@ if (isset($_REQUEST['type'])) {
 }(document, 'script', 'facebook-jssdk'));
 </script>
 
-<?
+<?php
 if (preg_match("/(iphone|ipod|android)/i",$ua)){
    	exit ("<span style='font-size:80px;'>
    			Sorry ,Particle2dx doesn't work on MobilePhone. <br/><br/>
@@ -342,16 +342,16 @@ $plist_64=base64_encode($plist_temp);
 <div id="background" style="display:none; " >							
 
 			<table id="palette_bg" cellspacing=1 border=0 ><tr>
-				    <? 
+				    <?php 
 				    for($i=3;$i<=15;$i=$i+3) { 
 				    	echo "<tr>";
 						for($j=3;$j<=15;$j=$j+3) { 
 							for($k=3;$k<=15;$k=$k+3) { 							    
 						?>
-						<td col="bg" title="#<?=dechex($i*256+$j*16+$k);?>" 
-						style="background-color:#<?=dechex($i*256+$j*16+$k);?>;width:8px;height:8px;font-size:6px;">&nbsp;
+						<td col="bg" title="#<?php echo dechex($i*256+$j*16+$k);?>" 
+						style="background-color:#<?php echo dechex($i*256+$j*16+$k);?>;width:8px;height:8px;font-size:6px;">&nbsp;
 						</td>
-						<?  }
+						<?php  }
 					    } 
 					    echo "</tr>";
 			        }
@@ -659,7 +659,7 @@ $plist_64=base64_encode($plist_temp);
 							document.form_post_dl.type.value='p2dx_json';
 							$('#p2dx_out').text(JSON.stringify(xmls)).html(); 
 							$('#p2dx_json').attr('value',JSON.stringify(xmls));  
-							document.form_post_dl.submit(); " style="font-size:120%;font-weight:bold;" >AllJson</a><?=strGray(' array of all emitter as JSON') ?>
+							document.form_post_dl.submit(); " style="font-size:120%;font-weight:bold;" >AllJson</a><?php echo strGray(' array of all emitter as JSON') ?>
 		<br/><br/>
 
 		<form name="form_post_dl" method="post" >
@@ -682,7 +682,7 @@ $plist_64=base64_encode($plist_temp);
 					<img src='logo_cocos_arrow.png' />
 				</a>
 			</td><td colspan=2 >	
-				<span style="font-size:120%;"><?=strGray('PNG Contained') ?></span>
+				<span style="font-size:120%;"><?php echo strGray('PNG Contained') ?></span>
 			</td></tr>
 			<tr><td>
 				<a href="javascript:downloadPlistNoImg(slot);">
@@ -707,7 +707,7 @@ $plist_64=base64_encode($plist_temp);
 
 <div id="topleft_pane_template" style="display:none;" >
 	<table>
-	<? 
+	<?php 
 	foreach (array("BG","Water","Fire","FireWorks","Explosion","Meteor","Snow","Click","Smoke","Magic") as $val) { 
 		
 		echo "<tr><td>";
@@ -716,11 +716,11 @@ $plist_64=base64_encode($plist_temp);
 
 		$ary=explode("\n", trim(`ls plist | grep -i '${val}_' | grep -i 'plist'`));
 		foreach ($ary as $val1){ ?>
-			<a href="javascript:getPlist('<?=$val1 ?>')" onMouseOver="prevParticle('<?=$val1?>');" onMouseOut="prevEnd(); " ><?=preg_replace("/(.*?_)(.*)(\..*)/","$2",$val1) ?></a>
-		<? } ?>
+			<a href="javascript:getPlist('<?php echo $val1 ?>')" onMouseOver="prevParticle('<?php echo $val1?>');" onMouseOut="prevEnd(); " ><?php echo preg_replace("/(.*?_)(.*)(\..*)/","$2",$val1) ?></a>
+		<?php } ?>
 		</td><td>
 		 MultiEmitter 
-		<?		
+		<?php		
 		$ary2=array();
 		$ary2=explode("\n", trim(`ls plist | grep -i '${val}_' | grep -i 'p2dx'`));
 		foreach ($ary2 as $val2){
@@ -738,10 +738,10 @@ $plist_64=base64_encode($plist_temp);
 	<script>
 		// textureをセット
 		var old_name;
-		function setTex(name){ //name texture filename
+		function setTex(name, isFullPath){ //name texture filename
 			prev_string.setVisible(false);
 			//alert(name + " : " + png_gz_b64[name]);
-			texture1 = cc.TextureCache.getInstance().addImage('png/'+name+'.png');//元画像を用意
+			texture1 = cc.TextureCache.getInstance().addImage(isFullPath ? name : 'png/'+name+'.png');//元画像を用意
 			emitter[slot].setTexture(texture1);
 			png_gz_b64[slot]=png_gz_b64[name]; //slotのpngをセット
 			dumpToInputTag(slot);//inputタグに書き出す
@@ -760,23 +760,23 @@ $plist_64=base64_encode($plist_temp);
 			emitter[slot].setTexture(texture1);
 			prev_string.setVisible(false);
 
-			dumpToInputTag(slot);//inputタグに書き出す
+			//dumpToInputTag(slot);//inputタグに書き出す
 		}
 		
 	</script>
 	
 	<table><tr><td id='textures'>
-		<?
+		<?php
 		$pngs= explode("\n",trim(`ls png/ | grep -i 'png'`));
 		foreach ($pngs as $val){
 			$val=preg_replace("/(.*)(\..*)/",'$1',trim($val)); 
-			?><a href='javascript:void(0)' onClick='setTex("<?=$val?>"); 
+			?><a href='javascript:void(0)' onClick='setTex("<?php echo $val?>"); 
 													$("#textures").children("a").children("img").css("background-color",""); 
 													$(this).children("img").css("background-color","#aaaaff"); '
-										   onMouseOver='prevTex("<?=$val?>");' 
+										   onMouseOver='prevTex("<?php echo $val?>");' 
 										   onMouseOut='prevMouseOut();' 
-			<? if ($_SESSION['png_name']==$val) echo " style='font-weight:bold' "; ?>
-			><img src="png/<?=$val?>.png" alt="<?=$val ?>" /></a><?			
+			<?php if ($_SESSION['png_name']==$val) echo " style='font-weight:bold' "; ?>
+			><img src="png/<?php echo $val?>.png" alt="<?php echo $val ?>" /></a><?php			
 			$png_path= 'png/'.$val.'.png';
 			$png_binary=file_get_contents($png_path);
 			$gzip=gzencode($png_binary);
@@ -784,7 +784,7 @@ $plist_64=base64_encode($plist_temp);
 		}
 		$json_gz_b64_png= json_encode($png_gz_base64);
 		?>
-		<a href="javascript:setTex('png_ul/'+response);" style="font-weight:bold">
+		<a id="uploaded_png_a" href="javascript:void(0)" style="font-weight:bold">
 		    <img id="uploaded_png" src="" />
 		</a>
 		
@@ -814,6 +814,7 @@ $plist_64=base64_encode($plist_temp);
 			    clog(response);
 			    
 			    $("#uploaded_png").attr('src','png_ul/'+response);
+				$("#uploaded_png_a").attr('href', 'javascript:setTex("png_ul/' + response + '", true);');
 			    var myTexture = cc.TextureCache.getInstance().addImage('png_ul/'+response);//元画像を用意
 				emitter[slot].setTexture(myTexture);
 				
@@ -824,6 +825,7 @@ $plist_64=base64_encode($plist_temp);
 				   url: url,
 				   success:function(data){
 					   png_gz_b64[slot]=data;// gzip > base64 したファイルを取得
+					   png_gz_b64['png_ul/'+response]=data;
 				   }
 				});	
 				dumpToInputTag(slot);//inputタグに書き出す
@@ -842,15 +844,15 @@ $plist_64=base64_encode($plist_temp);
 		<div id="start_color" >startcol</div>	
 		
 		<table id="palette" cellspacing=1 border=0 ><tr>
-			    <? 
+			    <?php 
 			    for($i=3;$i<=15;$i=$i+3) { 
 			    	echo "<tr>";
 					for($j=3;$j<=15;$j=$j+3) { 
 						for($k=3;$k<=15;$k=$k+3) { 							    
 					?>
-					<td col="col" title="#<?=dechex($i*256+$j*16+$k);?>"  style="background-color:#<?=dechex($i*256+$j*16+$k);?>;width:8px;height:8px;font-size:6px;">&nbsp;
+					<td col="col" title="#<?php echo dechex($i*256+$j*16+$k);?>"  style="background-color:#<?php echo dechex($i*256+$j*16+$k);?>;width:8px;height:8px;font-size:6px;">&nbsp;
 					</td>
-					<?  }
+					<?php  }
 				    } 
 				    echo "</tr>";
 		        } ?>
@@ -937,9 +939,20 @@ $plist_64=base64_encode($plist_temp);
 					<input type="range" id="startSize" name="startSize" mix="0" max="400" onMouseMove="
 						if (!flg_mousedown) return;
 						emitter[slot].setStartSize(parseFloat(this.value)); dumpToInputTag();" />
+						
+					<input type="text" size="2" id="startSize_text"name="startSize_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setStartSize(parseFloat(this.value));dumpToInputTag(); "> 
+						
 					<input type="range" id="startSizeVar" name="startSize" mix="0" max="400" onMouseMove="
 						if (!flg_mousedown) return;
 						emitter[slot].setStartSizeVar(parseFloat(this.value)); dumpToInputTag();" />
+						
+					<input type="text" size="2" id="startSizeVar_text"name="startSizeVar_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setStartSizeVar(parseFloat(this.value));dumpToInputTag(); "> 
 			</td></tr>
 			<tr><td>
 				Spin 
@@ -950,10 +963,21 @@ $plist_64=base64_encode($plist_temp);
 				onMouseMove="
 					if (!flg_mousedown) return;
 					emitter[slot].setStartSpin(parseFloat(this.value));dumpToInputTag();" />
-				<input type="range" id="startSpin_var" name="startSpin_var" min="0" max="1440" value="" 
+						
+				<input type="text" size="2" id="startSpin_text"name="startSpin_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+						emitter[slot].setStartSpin(parseFloat(this.value));dumpToInputTag(); "> 
+						
+				<input type="range" id="startSpinVar" name="startSpinVar" min="0" max="1440" value="" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setStartSpinVar(parseFloat(this.value));dumpToInputTag();" />		
+					emitter[slot].setStartSpinVar(parseFloat(this.value));dumpToInputTag();" />	
+						
+				<input type="text" size="2" id="startSpinVar_text"name="startSpinVar_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+						emitter[slot].setStartSpinVar(parseFloat(this.value));dumpToInputTag(); "> 	
 			</td></tr>
 			<tr><td>																
 					a 
@@ -965,7 +989,20 @@ $plist_64=base64_encode($plist_temp);
 					//$('img[id*=start_size_pic]').css('opacity',this.value);
 					updStartCol(); 
 					dumpToInputTag();" />
+						
+				<input type="text" size="2" id="start_a_text"name="start_a_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; }
+						$('#start_a').val(parseFloat(this.value));
+						updStartCol(); dumpToInputTag(); "> 	
+						
 				 <input type="range"  id="start_a_var" name="start_a_var"  mix="0" max="1" step="0.05" onMouseMove="updStartColVar(); dumpToInputTag();" /> 
+						
+				<input type="text" size="2" id="start_a_var_text"name="start_a_var_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 			
+						$('#start_a_var').val(parseFloat(this.value));
+						updStartColVar(); dumpToInputTag(); "> 	
 			</td></tr>
 			<tr><td>
 						r 
@@ -975,9 +1012,22 @@ $plist_64=base64_encode($plist_temp);
 				<input type="range" size="5" id="start_r"     name="start_r"      mix="0" max="1" step="0.05" onMouseMove="
 				if (!flg_mousedown) return;
 				updStartCol();     dumpToInputTag();" />
+						
+				<input type="text" size="2" id="start_r_text"name="start_r_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; }
+						$('#start_r').val(parseFloat(this.value));
+						updStartCol(); dumpToInputTag(); ">
+						
 				<input type="range" size="5" id="start_r_var" name="start_r_var"  mix="0" max="1" step="0.05" onMouseMove="
 				if (!flg_mousedown) return;
 				updStartColVar();  dumpToInputTag();" />	
+						
+				<input type="text" size="2" id="start_r_var_text"name="start_r_var_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 			
+						$('#start_r_var').val(parseFloat(this.value));
+						updStartColVar(); dumpToInputTag(); "> 	
 			</td></tr>
 			<tr><td>					
 						g 
@@ -987,9 +1037,22 @@ $plist_64=base64_encode($plist_temp);
 				<input type="range" size="5" id="start_g"     name="start_g"      mix="0" max="1" step="0.05" onMouseMove="
 				if (!flg_mousedown) return;
 				updStartCol();     dumpToInputTag();" />
+						
+				<input type="text" size="2" id="start_g_text"name="start_g_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; }
+						$('#start_g').val(parseFloat(this.value));
+						updStartCol(); dumpToInputTag(); ">
+						
 				<input type="range" size="5" id="start_g_var" name="start_g_var"  mix="0" max="1" step="0.05" onMouseMove="
 				if (!flg_mousedown) return;
-				updStartColVar();  dumpToInputTag();" /> <br/>
+				updStartColVar();  dumpToInputTag();" />
+						
+				<input type="text" size="2" id="start_g_var_text"name="start_g_var_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 			
+						$('#start_g_var').val(parseFloat(this.value));
+						updStartColVar(); dumpToInputTag(); "> 	
 			</td></tr>
 			<tr><td>	
 						b 
@@ -1000,10 +1063,23 @@ $plist_64=base64_encode($plist_temp);
 				onMouseMove="
 					if (!flg_mousedown) return;
 					updStartCol();     dumpToInputTag();" />
+						
+				<input type="text" size="2" id="start_b_text"name="start_b_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; }
+						$('#start_b').val(parseFloat(this.value));
+						updStartCol(); dumpToInputTag(); ">
+						
 				<input type="range" size="5" id="start_b_var" name="start_b_var"  mix="0" max="1" step="0.05" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					updStartColVar();  dumpToInputTag();" /> <br/>
+					updStartColVar();  dumpToInputTag();" /> 
+						
+				<input type="text" size="2" id="start_b_var_text"name="start_b_var_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 			
+						$('#start_b_var').val(parseFloat(this.value));
+						updStartColVar(); dumpToInputTag(); "> 	
 			</td></tr>
 			</table>
 	
@@ -1014,17 +1090,28 @@ $plist_64=base64_encode($plist_temp);
 			<table>
 			<tr><td>		
 					Size 
-			</td><td td width="80" >
+			</td><td width="80" >
 					<span id="end_size_disp">**</span>
 			</td><td>
 					<input type="range" id="endSize" name="endSize" mix="0" max="400" 
 					onMouseMove="
 						if (!flg_mousedown) return;
 						emitter[slot].setEndSize(parseFloat(this.value)); dumpToInputTag();" />
+						
+					<input type="text" size="2" id="endSize_text"name="endSize_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setEndSize(parseFloat(this.value));dumpToInputTag(); "> 
+							
 					<input type="range" id="endSizeVar" name="endSize" mix="0" max="400" 
 					onMouseMove="
 						if (!flg_mousedown) return;
 						emitter[slot].setEndSizeVar(parseFloat(this.value)); dumpToInputTag();" />
+						
+					<input type="text" size="2" id="endSizeVar_text"name="endSizeVar_text" 
+						onChange="
+							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+							emitter[slot].setEndSizeVar(parseFloat(this.value));dumpToInputTag(); "> 
 			</td></tr>
 			<tr><td>
 				Spin 
@@ -1035,11 +1122,21 @@ $plist_64=base64_encode($plist_temp);
 				onMouseMove="
 					if (!flg_mousedown) return;
 					emitter[slot].setEndSpin(parseFloat(this.value));dumpToInputTag();" />
+						
+				<input type="text" size="2" id="endSpin_text"name="endSpin_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+						emitter[slot].setEndSpin(parseFloat(this.value));dumpToInputTag(); "> 
 				
 				<input type="range" id="endSpin_var" name="endSpin_var" min="0" max="1440" value="" 
 				onMouseMove="
 					if (!flg_mousedown) return;
 					emitter[slot].setEndSpinVar(parseFloat(this.value));dumpToInputTag();" />		
+						
+				<input type="text" size="2" id="endSpinVar_text"name="endSpinVar_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
+						emitter[slot].setEndSpinVar(parseFloat(this.value));dumpToInputTag(); "> 
 				
 			</td></tr>
 			<tr><td>
@@ -1050,11 +1147,25 @@ $plist_64=base64_encode($plist_temp);
 						<input type="range" id="end_a" name="end_a" min="0" max="1" step="0.05" 
 						onMouseMove="
 							if (!flg_mousedown) return;
-							//$('#img[id*=end_size_pic]').css('opacity',this.value); updEndCol(); dumpToInputTag();" />
+							//$('#img[id*=end_size_pic]').css('opacity',this.value);
+							updEndCol(); dumpToInputTag();" />
+						
+				<input type="text" size="2" id="end_a_text"name="end_a_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; }
+						$('#end_a').val(parseFloat(this.value));
+						updEndCol(); dumpToInputTag(); "> 	
+						
 					    <input type="range" size="5" id="end_a_var" name="end_a_var" min="0" max="1" step="0.05"  
 					    onMouseMove="
 					    	if (!flg_mousedown) return;
-					    	updEndColVar();  dumpToInputTag();" /> <br/>
+					    	updEndColVar();  dumpToInputTag();" />
+						
+				<input type="text" size="2" id="end_a_var_text"name="end_a_var_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 			
+						$('#end_a_var').val(parseFloat(this.value));
+						updEndColVar(); dumpToInputTag(); "> 	
 			</td></tr>
 			<tr><td>
 						r     
@@ -1065,10 +1176,23 @@ $plist_64=base64_encode($plist_temp);
 						onMouseMove="
 							if (!flg_mousedown) return;
 							updEndCol();     dumpToInputTag();" />
+						
+				<input type="text" size="2" id="end_r_text"name="end_r_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; }
+						$('#end_r').val(parseFloat(this.value));
+						updEndCol(); dumpToInputTag(); "> 	
+						
 						 <input type="range" size="5" id="end_r_var" name="end_r_var" mix="0" max="1" step="0.05" 
 						 onMouseMove="
 						 	if (!flg_mousedown) return;
-						 	updEndColVar();  dumpToInputTag();" /> <br/>
+						 	updEndColVar();  dumpToInputTag();" />
+						
+				<input type="text" size="2" id="end_r_var_text"name="end_r_var_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 			
+						$('#end_r_var').val(parseFloat(this.value));
+						updEndColVar(); dumpToInputTag(); "> 	
 			</td></tr>
 			<tr><td>
 						g 
@@ -1079,10 +1203,23 @@ $plist_64=base64_encode($plist_temp);
 						onMouseMove="
 							if (!flg_mousedown) return;
 							updEndCol();     dumpToInputTag();" />
+						
+				<input type="text" size="2" id="end_g_text"name="end_g_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; }
+						$('#end_g').val(parseFloat(this.value));
+						updEndCol(); dumpToInputTag(); "> 	
+						
 						 <input type="range" size="5" id="end_g_var" name="end_g_var" mix="0" max="1" step="0.05" 
 						 onMouseMove="
 						 	if (!flg_mousedown) return;
-						 	updEndColVar();  dumpToInputTag();" /> <br/>
+						 	updEndColVar();  dumpToInputTag();" />
+						
+				<input type="text" size="2" id="end_g_var_text"name="end_g_var_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 			
+						$('#end_g_var').val(parseFloat(this.value));
+						updEndColVar(); dumpToInputTag(); "> 	
 			</td></tr>
 			<tr><td>
 						b     
@@ -1093,10 +1230,23 @@ $plist_64=base64_encode($plist_temp);
 						onMouseMove="
 							if (!flg_mousedown) return;
 							updEndCol();     dumpToInputTag();" />
+						
+				<input type="text" size="2" id="end_b_text"name="end_b_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; }
+						$('#end_b').val(parseFloat(this.value));
+						updEndCol(); dumpToInputTag(); "> 	
+						
 						 <input type="range" size="5" id="end_b_var" name="end_b_var" mix="0" max="1" step="0.05" 
 						 onMouseMove="
 						 	if (!flg_mousedown) return;
-						 	updEndColVar();  dumpToInputTag();" /> <br/>
+						 	updEndColVar();  dumpToInputTag();" /> 
+						
+				<input type="text" size="2" id="end_b_var_text"name="end_b_var_text" 
+					onChange="
+						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 			
+						$('#end_b_var').val(parseFloat(this.value));
+						updEndColVar(); dumpToInputTag(); "> 
 			</td></tr>
 			</table>
 
@@ -1267,7 +1417,7 @@ $plist_64=base64_encode($plist_temp);
 			<table ><tr><td style="vertical-align:top;" >
 					Angle 
 					<span id="disp_angle">**</span> Speed <span id="disp_speed">**</span><br/>		
-					<canvas id="cv_angle" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
+					<canvas id="cv_angle" style="background-color:#333333; width:<?php echo $boxsize?>px; height:<?php echo $boxsize?>px;">
 					</canvas>
 	
 				
@@ -1373,7 +1523,7 @@ $plist_64=base64_encode($plist_temp);
 			</td><td style="vertical-align:top;">
 	
 				EmitArea <span id="emit_area">** x **</span><br/>
-				<canvas id="set_pos" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
+				<canvas id="set_pos" style="background-color:#333333; width:<?php echo $boxsize?>px; height:<?php echo $boxsize?>px;">
 				</canvas>
 				<br/>
 				<a href="javascript:emitter[slot].setPosVar(cc.p(0,0));     dumpToInputTag(slot);">0x0</a>
@@ -1433,7 +1583,7 @@ $plist_64=base64_encode($plist_temp);
 			</td><td style="vertical-align:top;">
 			
 				Gravity <span id="grav_01">** x **</span><br/>
-				<canvas id="grav_pad" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
+				<canvas id="grav_pad" style="background-color:#333333; width:<?php echo $boxsize?>px; height:<?php echo $boxsize?>px;">
 				</canvas>
 				<script>
 				    var cv_grav = document.getElementById('grav_pad');
@@ -1691,7 +1841,7 @@ $plist_64=base64_encode($plist_temp);
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
 							emitter[slot].setStartRadiusVar(parseFloat(this.value)); 
 							dumpToInputTag(); "> 					
-					<?=strGray("発生位置:px"); ?>	
+					<?php echo strGray("発生位置:px"); ?>	
 			</td></tr>			
 			<tr><td>
 					MinRadius 
@@ -1711,7 +1861,7 @@ $plist_64=base64_encode($plist_temp);
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
 							emitter[slot].setEndRadius(parseFloat(this.value)); 
 							dumpToInputTag(); "> 	
-							<?=strGray("終了位置:px"); ?>
+							<?php echo strGray("終了位置:px"); ?>
 			</td></tr>
 			<tr><td>
 					Rotate/Sec
@@ -1743,7 +1893,7 @@ $plist_64=base64_encode($plist_temp);
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
 							emitter[slot].setRotatePerSecondVar(parseFloat(this.value)); 
-							dumpToInputTag(); "> 	<?=strGray("円周に沿った回転量"); ?>
+							dumpToInputTag(); "> 	<?php echo strGray("円周に沿った回転量"); ?>
 
 					 	
 
@@ -1758,13 +1908,13 @@ $plist_64=base64_encode($plist_temp);
 				var slot=0;
 				var slot_bg=0;
 		
-				var png_gz_b64=<?=$json_gz_b64_png ?>;
-				var xml_base64='<?=$plist_64?>';
+				var png_gz_b64=<?php echo $json_gz_b64_png ?>;
+				var xml_base64='<?php echo $plist_64?>';
 				
 				var corona_base_json=$.ajax({ url: "particle/template_corona.json", async: false }).responseText;		
 				
 				var png_name=[];
-				png_name[slot]="<?=$_SESSION['png_name']?>";
+				png_name[slot]="<?php echo $_SESSION['png_name']?>";
 				var emitter=[];
 				
 				$("input[type=range]").bind( 'mousedown' ,function(){ 

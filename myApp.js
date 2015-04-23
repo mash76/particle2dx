@@ -280,17 +280,25 @@ function dumpToInputTag(p_slot){
 		//start
 		start_col=emitter[p_slot].getStartColor(); //c4f   var.r var.g var.b var.a
 		$('#start_a').val(round2(start_col.a));
-		$('#start_r').val(round2(start_col.r));		
+		$('#start_a_text').val(round2(start_col.a));
+		$('#start_r').val(round2(start_col.r));
+		$('#start_r_text').val(round2(start_col.r));		
 		$('#start_g').val(round2(start_col.g));
+		$('#start_g_text').val(round2(start_col.g));
 		$('#start_b').val(round2(start_col.b));
+		$('#start_b_text').val(round2(start_col.b));
 		$("#start_color").css("background-color","rgba("+start_col.r*100+"%, "+start_col.g*100+"%, "+start_col.b*100+"%, "+round2(start_col.a)+")");
 		$("#start_color").html($("#start_color").css("background-color"));	
 		
 		start_col_var=emitter[p_slot].getStartColorVar(); //c4f type  var.r var.g var.b var.a
 		$('#start_a_var').val(start_col_var.a);
+		$('#start_a_var_text').val(round2(start_col_var.a));
 		$('#start_r_var').val(start_col_var.r);		
+		$('#start_r_var_text').val(round2(start_col_var.r));		
 		$('#start_g_var').val(start_col_var.g);
+		$('#start_g_var_text').val(round2(start_col_var.g));
 		$('#start_b_var').val(start_col_var.b);
+		$('#start_b_var_text').val(round2(start_col_var.b));
 
 		$('#start_a_disp').html(round2(start_col.a)+"±" + round2(start_col_var.a));
 		$('#start_r_disp').html(round2(start_col.r)+"±" + round2(start_col_var.r));
@@ -302,25 +310,37 @@ function dumpToInputTag(p_slot){
 
 		$('#start_size_disp').html(parseInt(emitter[p_slot].getStartSize())+"±"+parseInt(emitter[p_slot].getStartSizeVar()));		
 		$('#startSize').val(emitter[p_slot].getStartSize());
+		$('#startSize_text').val(emitter[p_slot].getStartSize());
 		$('#startSizeVar').val(emitter[p_slot].getStartSizeVar());		
+		$('#startSizeVar_text').val(emitter[p_slot].getStartSizeVar());		
 		
 		$('#startSpin').val(emitter[p_slot].getStartSpin());
+    $('#startSpin_text').val(emitter[p_slot].getStartSpin());
 		$('#startSpinVar').val(emitter[p_slot].getStartSpinVar());
+		$('#startSpinVar_text').val(emitter[p_slot].getStartSpinVar());
 		$('#start_spin_disp').html(emitter[p_slot].getStartSpin()+"±"+emitter[p_slot].getStartSpinVar());	
 		
 		end_col=emitter[p_slot].getEndColor();
 		$('#end_a').val(end_col.a);
+		$('#end_a_text').val(round2(end_col.a));
 		$('#end_r').val(end_col.r);		
+		$('#end_r_text').val(round2(end_col.r));
 		$('#end_g').val(end_col.g);
+		$('#end_g_text').val(round2(end_col.g));
 		$('#end_b').val(end_col.b);
+		$('#end_b_text').val(round2(end_col.b));
 		$("#end_color").css("background-color","rgba("+end_col.r*100+"%, "+end_col.g*100+"%, "+end_col.b*100+"%, "+round2(end_col.a)+")");
 		$("#end_color").html($("#end_color").css("background-color"));		
 		
 		end_col_var=emitter[p_slot].getEndColorVar(); //c4f type  var.r var.g var.b var.a
 		$('#end_a_var').val(end_col_var.a);
+		$('#end_a_var_text').val(round2(end_col_var.a));
 		$('#end_r_var').val(end_col_var.r);		
+		$('#end_r_var_text').val(round2(end_col_var.r));
 		$('#end_g_var').val(end_col_var.g);
+		$('#end_g_var_text').val(round2(end_col_var.g));
 		$('#end_b_var').val(end_col_var.b);
+		$('#end_b_var_text').val(round2(end_col_var.b));
 
 		$('#end_a_disp').html(round2(end_col.a)+"±" + round2(end_col_var.a));
 		$('#end_r_disp').html(round2(end_col.r)+"±" + round2(end_col_var.r));
@@ -329,10 +349,14 @@ function dumpToInputTag(p_slot){
 		
 		$('#end_size_disp').html(parseInt(emitter[p_slot].getEndSize())+"±"+parseInt(emitter[p_slot].getEndSizeVar()));	
 		$('#endSize').val(emitter[p_slot].getEndSize());
+		$('#endSize_text').val(emitter[p_slot].getEndSize());
 		$('#endSizeVar').val(emitter[p_slot].getEndSizeVar());
+		$('#endSizeVar_text').val(emitter[p_slot].getEndSizeVar());
 
 		$('#endSpin').val(emitter[p_slot].getEndSpin());
+		$('#endSpin_text').val(emitter[p_slot].getEndSpin());
 		$('#endSpin_var').val(emitter[p_slot].getEndSpinVar());
+		$('#endSpinVar_text').val(emitter[p_slot].getEndSpinVar());
 		$('#end_spin_disp').html(emitter[p_slot].getEndSpin()+"±"+emitter[p_slot].getEndSpinVar());		
 
 		//gravity
