@@ -1,10 +1,20 @@
 <?
-function strGray($str) { return "<span style='color:gray;'>".$str."</span>";}
+session_start();
+
 if ( !function_exists("gzdecode") ) {
     function gzdecode($data) {  return gzinflate(substr($data,10,-8)); } 
 }
 $ua=$_SERVER['HTTP_USER_AGENT'];
 $boxsize=200;
+
+
+function sGray($str) { return "<span style='color:gray;'>".$str."</span>";}
+date_default_timezone_set("Asia/Tokyo");
+
+$facebook_app_id="";
+
+include('include.php');
+
 
 if (isset($_REQUEST['type'])) {
 
@@ -57,6 +67,7 @@ if (isset($_REQUEST['type'])) {
             exit;
 			break;   
 
+		//facebook 
         case "cocos_plist_dl":  //cocos2dx download
         	$ext='.plist';
             header("Content-Type: text/xml;");
@@ -64,6 +75,7 @@ if (isset($_REQUEST['type'])) {
             echo rawurldecode($_REQUEST['plist_xml']);
             exit;
    	
+		//ダウンロード。そのまま返す。
 		case "corona_json_dl":
         	$ext='.json';
             header("Content-Type: text/json;");
@@ -71,7 +83,8 @@ if (isset($_REQUEST['type'])) {
             echo rawurldecode($_REQUEST['plist_xml']);
             exit;
 			break;
-			
+
+		//coronaのviewerから取り出せるようにpublicに保存			
 		case "corona_json_device";
 			//var_dump($_REQUEST);
 			echo $_REQUEST['key'];
@@ -87,8 +100,6 @@ if (isset($_REQUEST['type'])) {
     }
 }
 
-//echo `ls tmp_bg/`;   // all BG file 
-//echo `find tmp_bg/ -name "*.png" -mmin +5`;  //  all 
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -98,13 +109,16 @@ if (isset($_REQUEST['type'])) {
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="description" content="OnlineParticleEditor for cocos2dx CoronaSDK Win&Mac">
 
+<meta property="og:type" content="website" />
 <meta property="og:title" content="Particle2dx" />
-<meta property="og:type" content="tool" />
-<meta property="og:url" content="http://particle2dx.com/" />
+<meta property="og:url" content="http://particle2dx.com/stg/" />
 <meta property="og:locale" content="ja_JP" />
 <meta property="og:image" content="http://particle2dx.com/thumbnail.png" />
 <meta property="og:site_name" content="OnlineParticleEditor for cocos2dx CoronaSDK Win&Mac " />
 <meta property="og:description" content="OnlineParticleEditor for cocos2dx CoronaSDK Win&Mac " />
+
+<!-- デバイス幅でズームなし -->
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
@@ -157,23 +171,24 @@ if (isset($_REQUEST['type'])) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=254469811382518";
+  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=<?=$facebook_app_id?>";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
 </script>
 
 <?
 if (preg_match("/(iphone|ipod|android)/i",$ua)){
-   	exit ("<span style='font-size:80px;'>
-   			Sorry ,Particle2dx doesn't work on MobilePhone. <br/><br/>
-   			use WinPC/Mac. <br/><br/>
+
+   	exit ("<p style='text-align:center; font-size:170%;' >
+   			Sorry,Particle2dx doesn't work on MobilePhone.<br/>
+   			use WinPC/Mac. <br/>
    			
-   			<a href='https://www.youtube.com/channel/UCAa8s6pDjeER0SqMgvme4ew'>Youtube Tutorial</a><br/><br/>
-   			
-   			<img src='thumbnail.png' style='border:2px solid black;' /><br/><br/>
-   			<img src='thumbnail2.png' style='border:2px solid black;' /><br/>
-   		</span>
-   			<script> I will  </script>
+   			<a href='https://www.youtube.com/channel/UCAa8s6pDjeER0SqMgvme4ew' style='font-size:140%;font-weight:bold;' >Youtube Tutorial</a><br/>
+   			<a href='https://www.facebook.com/particle2dx' target='_blank' style='font-size:140%;font-weight:bold;' >FacebookPage</a><br/>
+   			</p>
+   			<img src='thumbnail.png' style='border:2px solid black;'  width='100%' height='100%'  /><br/><br/>
+   			<img src='thumbnail2.png' style='border:2px solid black;' width='100%' height='100%' /><br/>
+   		</p>
    		");
 }
 if (!preg_match("/(Chrome|safari|firefox)/i",$ua)){
@@ -300,13 +315,13 @@ $plist_64=base64_encode($plist_temp);
 									//json保存
 									$.post("?" , 
 										{ type:"corona_json_device" , key:keypass , 
-										 json:encodeURIComponent(baseXML2Plist(slot,false,'corona',corona_base_json)) } ,
+										 json:encodeURIComponent(baseXML2Plist(p2dx.slot_current,false,'corona',corona_base_json)) } ,
 										function(data){}
 									); 
 									//画像保存
 									$.post("?" , 
 										{ type:"corona_png_device" , key:keypass , 
-										 b64:png_gz_b64[slot] } ,
+										 b64:png_gz_b64[p2dx.slot_current] } ,
 										function(data){}
 									); 
 									
@@ -317,7 +332,7 @@ $plist_64=base64_encode($plist_temp);
 									//document.form_post_dl.plist_xml.value=encodeURIComponent(baseXML2Plist(p_slot,false,corona_base_json));
 									//document.form_post_dl.submit();
 						    		
-						    		console.log(xmls[slot])
+						    		console.log(xmls[p2dx.slot_current])
 					    		}
 					    		
 					    	
@@ -449,8 +464,8 @@ $plist_64=base64_encode($plist_temp);
 						layers=cc.Director.getInstance().getRunningScene().getChildren();
 						layers[0].addChild(bg_sprite,2);
 						
-						slot_bg=-2;
-						dumpToInputTag(slot);
+						p2dx.slot_bg = -2;
+						dumpToInputTag(p2dx.slot_current);
 					}
 			  });
 		      return false;
@@ -487,8 +502,8 @@ $plist_64=base64_encode($plist_temp);
 						layers=cc.Director.getInstance().getRunningScene().getChildren();
 						layers[0].addChild(fg_sprite,7);
 						
-						slot_bg=-2;
-						dumpToInputTag(slot);
+						p2dx.slot_bg = -2;
+						dumpToInputTag(p2dx.slot_current);
 					}
 			  });
 		      return false;
@@ -506,25 +521,32 @@ $plist_64=base64_encode($plist_temp);
 </div>
 
 						<script>
-							resos={
-								"iPhone":{name:"iPhone",x:320,y:480},							
-								"iPhone4":{name:"iPhone4",x:640,y:960},
-								"iPhone5":{name:"iPhone5",x:640,y:1136},
-								"iPad":{name:"iPad",x:768,y:1024},
+							resos = {
+								"iPhone" 	:{name:"iPhone",x:320,y:480},							
+								"iPhone4"	:{name:"iPhone4",x:640,y:960},
+								"iPhone5/5s":{name:"iPhone5/5s",x:640,y:1136},
+								"iPhone6/6s":{name:"iPhone6/6s",x:750,y:1334},
+								"iPhone6Plus/6sPlus":{name:"iPhone6/6s",x:1080,y:1920},
+								"iPad"		:{name:"iPad",x:768,y:1024},
 								"iPad Retina":{name:"iPad Retina",x:1536,y:2048},
 
-								"android":{name:"android",x:720,y:1280},			
-								"android2":{name:"android2",x:1080,y:1920},
+								"android"	:{name:"android",x:720,y:1280},			
+								"android2 "	:{name:"android2",x:1080,y:1920},
 
-								"landscape iPhone":{name:"landscape iPhone",x:480,y:320},
-								"landscape iPhone4":{name:"landscape iPhone4",x:960,y:640},
-								"landscape iPhone5":{name:"landscape iPhone5",x:1136,y:640},
-								"landscapeiPad":{name:"landscape iPad",x:1024,y:768},
-								"landscape iPad Retina":{name:"landscape iPad Retina",x:2047,y:1536},
-								"landscape android":{name:"landscape android",x:1280,y:720},
-								"landscape android2":{name:"landscape android2",x:1920,y:1080}
+								"landscape iPhone"		:{name:"landscape iPhone",x:480,y:320},
+								"landscape iPhone4"		:{name:"landscape iPhone4",x:960,y:640},
+								"landscape iPhone5/5s"	:{name:"landscape iPhone5",x:1136,y:640},
+								"landscape iPhone6/6s"	:{name:"landscape iPhone5",x:1334,y:750},
+								"landscape iPhone6Plus/6sPlus"	:{name:"landscape iPhone6/6s",x:1920,y:1080},
+																
+								"landscapeiPad"			:{name:"landscape iPad",x:1024,y:768},
+								"landscape iPad Retina"	:{name:"landscape iPad Retina",x:2047,y:1536},
+								
+								"landscape android"		:{name:"landscape android",x:1280,y:720},
+								"landscape android2"	:{name:"landscape android2",x:1920,y:1080}
 							};
-							reso_html="<table>";
+							
+							reso_html = "<table>";
 							for (ind in resos){
 								js_src="javascript:setCSize(resos['"+ind+"'],current_reso_scale); setGrid($('#grid').val()); $('#panel_resolution').slideToggle(30);";
 								
@@ -566,7 +588,7 @@ $plist_64=base64_encode($plist_temp);
 								     xmlStr2emitter(e.target.result);
 								     //画面の中央に
 								     var size = cc.Director.getInstance().getWinSize();
-								     emitter[slot].setPosition(cc.p(size.width/2,size.height/2));
+								     emitter[p2dx.slot_current].setPosition(cc.p(size.width/2,size.height/2));
 								}
 						     };
 						     reader.readAsText(file);
@@ -625,19 +647,22 @@ $plist_64=base64_encode($plist_temp);
 	<a id="panelink_template" href="javascript:toggleTopleftPane('import');"   style="font-size:140%;">
 	<strong><span class="headchar">E</span>xport</strong></a>&nbsp; 
 	
-	<a href="javascript:removeSlot(slot);">Remove</a> 
-	<a href="javascript:duplicateSlot(slot);">Duplicate</a>
+	<a href="javascript:removeSlot(p2dx.slot_current);">Remove</a> 
+	<a href="javascript:duplicateSlot(p2dx.slot_current);">Duplicate</a>
 	<a href="javascript:getSnapshot();" >Snapshot</a>
 	
 	<span id="snapshots" ></span>
 	<a href="javascript:clrSnapshot();" style="color:#dddddd;">clear</a>
+	
+
+	
 	<br/>
 	
 	<!--
 		VariationCopy 
-		<a href="javascript:color9Slot(slot);">18Cols</a> 
-		<a href="javascript:size4Slot(slot);">4size</a> 
-		<a href="javascript:speed4Slot(slot);">4Speeds</a>	
+		<a href="javascript:color9Slot(p2dx.slot_current);">18Cols</a> 
+		<a href="javascript:size4Slot(p2dx.slot_current);">4size</a> 
+		<a href="javascript:speed4Slot(p2dx.slot_current);">4Speeds</a>	
 	-->
 
 
@@ -659,7 +684,7 @@ $plist_64=base64_encode($plist_temp);
 							document.form_post_dl.type.value='p2dx_json';
 							$('#p2dx_out').text(JSON.stringify(xmls)).html(); 
 							$('#p2dx_json').attr('value',JSON.stringify(xmls));  
-							document.form_post_dl.submit(); " style="font-size:120%;font-weight:bold;" >AllJson</a><?=strGray(' array of all emitter as JSON') ?>
+							document.form_post_dl.submit(); " style="font-size:120%;font-weight:bold;" >AllJson</a><?=sGray(' array of all emitter as JSON') ?>
 		<br/><br/>
 
 		<form name="form_post_dl" method="post" >
@@ -682,25 +707,25 @@ $plist_64=base64_encode($plist_temp);
 					<img src='logo_cocos_arrow.png' />
 				</a>
 			</td><td colspan=2 >	
-				<span style="font-size:120%;"><?=strGray('PNG Contained') ?></span>
+				<span style="font-size:120%;"><?=sGray('PNG Contained') ?></span>
 			</td></tr>
 			<tr><td>
-				<a href="javascript:downloadPlistNoImg(slot);">
+				<a href="javascript:downloadPlistNoImg(p2dx.slot_current);">
 					<img src='logo_cocos_arrow.png' />	
 				</a> 
 			</td><td>
 				+ 
 			</td><td>			
-				<a id="dl_link_cocos" href="javascript:downloadPng(slot);" style="font-size:120%;" >particle_texture.png</a>
+				<a id="dl_link_cocos" href="javascript:downloadPng(p2dx.slot_current);" style="font-size:120%;" >particle_texture.png</a>
 			</td></tr>
 			<tr><td>
-				<a href="javascript:downloadJsonNoImg(slot);">
+				<a href="javascript:downloadJsonNoImg(p2dx.slot_current);">
 					<img src='logo_corona_arrow.png' />				
 				</a>
 			</td><td>	
 				+ 
 			</td><td>					
-				<a id="dl_link_corona" href="javascript:downloadPng(slot);" style="font-size:120%;" >particle_texture.png</a>
+				<a id="dl_link_corona" href="javascript:downloadPng(p2dx.slot_current);" style="font-size:120%;" >particle_texture.png</a>
 			</td></tr>
 		</table>
 </div>
@@ -742,25 +767,25 @@ $plist_64=base64_encode($plist_temp);
 			prev_string.setVisible(false);
 			//alert(name + " : " + png_gz_b64[name]);
 			texture1 = cc.TextureCache.getInstance().addImage('png/'+name+'.png');//元画像を用意
-			emitter[slot].setTexture(texture1);
-			png_gz_b64[slot]=png_gz_b64[name]; //slotのpngをセット
-			dumpToInputTag(slot);//inputタグに書き出す
+			emitter[p2dx.slot_current].setTexture(texture1);
+			png_gz_b64[p2dx.slot_current]=png_gz_b64[name]; //slotのpngをセット
+			dumpToInputTag(p2dx.slot_current);//inputタグに書き出す
 		}
 		
 		function prevTex(name){
 			prev_string.setVisible(false);
 			var temp_tex = cc.TextureCache.getInstance().addImage('png/'+name+'.png');//元画像を用意
 			clog("prevTex " + 'png/'+name+'.png')
-			emitter[slot].setTexture(temp_tex);
+			emitter[p2dx.slot_current].setTexture(temp_tex);
 			prev_string.setVisible(true);
 		}
 		
 		function prevMouseOut(name){
 			clog('prevMouseOut texture1=' + texture1);
-			emitter[slot].setTexture(texture1);
+			emitter[p2dx.slot_current].setTexture(texture1);
 			prev_string.setVisible(false);
 
-			dumpToInputTag(slot);//inputタグに書き出す
+			dumpToInputTag(p2dx.slot_current);//inputタグに書き出す
 		}
 		
 	</script>
@@ -815,7 +840,7 @@ $plist_64=base64_encode($plist_temp);
 			    
 			    $("#uploaded_png").attr('src','png_ul/'+response);
 			    var myTexture = cc.TextureCache.getInstance().addImage('png_ul/'+response);//元画像を用意
-				emitter[slot].setTexture(myTexture);
+				emitter[p2dx.slot_current].setTexture(myTexture);
 				
 				url="index.php?type=b64gzpng_dl&filename="+response;
 				$.ajax({
@@ -823,10 +848,10 @@ $plist_64=base64_encode($plist_temp);
 				   type: "GET",
 				   url: url,
 				   success:function(data){
-					   png_gz_b64[slot]=data;// gzip > base64 したファイルを取得
+					   png_gz_b64[p2dx.slot_current]=data;// gzip > base64 したファイルを取得
 				   }
 				});	
-				dumpToInputTag(slot);//inputタグに書き出す
+				dumpToInputTag(p2dx.slot_current);//inputタグに書き出す
 			   }
 			  });
 		      return false;
@@ -839,6 +864,16 @@ $plist_64=base64_encode($plist_temp);
 
 <table><tr><td style="vertical-align:top;">
 	</td><td style="vertical-align:top;">	
+
+	</td><td style="vertical-align:top;">
+									
+</td></tr></table>
+			  Blend 
+			  <a id="blend_add"    href="javascript:emitter[p2dx.slot_current].setBlendAdditive(true);  dumpToInputTag(p2dx.slot_current);">Additive</a> 
+			  <a id="blend_normal" href="javascript:emitter[p2dx.slot_current].setBlendAdditive(false); dumpToInputTag(p2dx.slot_current);">Normal</a> 
+<table><tr><td>
+	<h3><span style="color:gray;">Start</span></h3>
+	
 		<div id="start_color" >startcol</div>	
 		
 		<table id="palette" cellspacing=1 border=0 ><tr>
@@ -867,10 +902,10 @@ $plist_64=base64_encode($plist_temp);
 			p_ary = palette_col.split(",");
 	   	   col_3b= cc.c3b(p_ary[0],p_ary[1],p_ary[2]);
 	   	   col_4f=cc.c4FFromccc3B(col_3b);
-	   	   emitter[slot].setStartColor(col_4f);
+	   	   emitter[p2dx.slot_current].setStartColor(col_4f);
 	   	   prev_string.setVisible(true);
 	   	   //emitter からテキストボックスへ
-	   	   dumpToInputTag(slot);
+	   	   dumpToInputTag(p2dx.slot_current);
 	   });
 
 	   $("td[col=col]").bind("mousedown",function(){ 
@@ -881,49 +916,41 @@ $plist_64=base64_encode($plist_temp);
 			p_ary = palette_col.split(",");
 	   	   col_3b= cc.c3b(p_ary[0],p_ary[1],p_ary[2]);
 	   	   col_4f=cc.c4FFromccc3B(col_3b);
-	   	   emitter[slot].setStartColor(col_4f);
+	   	   emitter[p2dx.slot_current].setStartColor(col_4f);
 	   	   prev_string.setVisible(false);
 	   	   
-	   	   current_start_color=emitter[slot].getStartColor();
+	   	   current_start_color=emitter[p2dx.slot_current].getStartColor();
 	   	   //emitter からテキストボックスへ
-	   	   dumpToInputTag(slot);
+	   	   dumpToInputTag(p2dx.slot_current);
 	   });
 
 	   $("td[col=col]").bind("mouseout",function(){ 
 	   	  palette_col=$(this).css("background-color");
 	   	  $("#start_color").css("background-color",palette_col);
-	   	   emitter[slot].setStartColor(current_start_color);
+	   	   emitter[p2dx.slot_current].setStartColor(current_start_color);
 	   	   prev_string.setVisible(false);
 	   	   //emitter からテキストボックスへ
-	   	   dumpToInputTag(slot);
+	   	   dumpToInputTag(p2dx.slot_current);
 	   });
 	   
-	</script>
-	</td><td style="vertical-align:top;">
-									
-</td></tr></table>
-			  Blend 
-			  <a id="blend_add"    href="javascript:emitter[slot].setBlendAdditive(true);  dumpToInputTag(slot);">Additive</a> 
-			  <a id="blend_normal" href="javascript:emitter[slot].setBlendAdditive(false); dumpToInputTag(slot);">Normal</a> 
-<table><tr><td>
-	<h3><span style="color:gray;">Start</span></h3>
+	</script>	
 	
 	<script>
 		updStartCol=function(){
-			emitter[slot].setStartColor(new cc.Color4F(parseFloat($("#start_r").val()),parseFloat($("#start_g").val()),parseFloat($("#start_b").val()),
+			emitter[p2dx.slot_current].setStartColor(new cc.Color4F(parseFloat($("#start_r").val()),parseFloat($("#start_g").val()),parseFloat($("#start_b").val()),
 		   						parseFloat($("#start_a").val())));//r,g,b,a 
-		    current_start_color=emitter[slot].getStartColor();
+		    current_start_color=emitter[p2dx.slot_current].getStartColor();
 		};
 		updStartColVar=function(){
-			emitter[slot].setStartColorVar(new cc.Color4F(parseFloat($("#start_r_var").val()),parseFloat($("#start_g_var").val()),parseFloat($("#start_b_var").val()),
+			emitter[p2dx.slot_current].setStartColorVar(new cc.Color4F(parseFloat($("#start_r_var").val()),parseFloat($("#start_g_var").val()),parseFloat($("#start_b_var").val()),
 		   						parseFloat($("#start_a_var").val())));//r,g,b,a
 		};
 		updEndCol=function(){
-			emitter[slot].setEndColor(new cc.Color4F(parseFloat($("#end_r").val()),parseFloat($("#end_g").val()),parseFloat($("#end_b").val()),
+			emitter[p2dx.slot_current].setEndColor(new cc.Color4F(parseFloat($("#end_r").val()),parseFloat($("#end_g").val()),parseFloat($("#end_b").val()),
 		   						parseFloat($("#end_a").val())));//r,g,b,a
 		};
 		updEndColVar=function(){
-			emitter[slot].setEndColorVar(new cc.Color4F(parseFloat($("#end_r_var").val()),parseFloat($("#end_g_var").val()),parseFloat($("#end_b_var").val()),
+			emitter[p2dx.slot_current].setEndColorVar(new cc.Color4F(parseFloat($("#end_r_var").val()),parseFloat($("#end_g_var").val()),parseFloat($("#end_b_var").val()),
 		   						parseFloat($("#end_a_var").val())));//r,g,b,a
 		};
 	</script>
@@ -936,10 +963,10 @@ $plist_64=base64_encode($plist_temp);
 			</td><td>
 					<input type="range" id="startSize" name="startSize" mix="0" max="400" onMouseMove="
 						if (!flg_mousedown) return;
-						emitter[slot].setStartSize(parseFloat(this.value)); dumpToInputTag();" />
+						emitter[p2dx.slot_current].setStartSize(parseFloat(this.value)); dumpToInputTag();" />
 					<input type="range" id="startSizeVar" name="startSize" mix="0" max="400" onMouseMove="
 						if (!flg_mousedown) return;
-						emitter[slot].setStartSizeVar(parseFloat(this.value)); dumpToInputTag();" />
+						emitter[p2dx.slot_current].setStartSizeVar(parseFloat(this.value)); dumpToInputTag();" />
 			</td></tr>
 			<tr><td>
 				Spin 
@@ -949,11 +976,11 @@ $plist_64=base64_encode($plist_temp);
 				<input type="range" id="startSpin" name="startSpin" min="-1440" max="1440" value="" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setStartSpin(parseFloat(this.value));dumpToInputTag();" />
+					emitter[p2dx.slot_current].setStartSpin(parseFloat(this.value));dumpToInputTag();" />
 				<input type="range" id="startSpin_var" name="startSpin_var" min="0" max="1440" value="" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setStartSpinVar(parseFloat(this.value));dumpToInputTag();" />		
+					emitter[p2dx.slot_current].setStartSpinVar(parseFloat(this.value));dumpToInputTag();" />		
 			</td></tr>
 			<tr><td>																
 					a 
@@ -1011,6 +1038,69 @@ $plist_64=base64_encode($plist_temp);
 
 			<h3><span style="color:gray;">End</span></h3>
 			
+			<div id="end_color">endcolor</div>
+
+
+		<table id="palette" cellspacing=1 border=0 ><tr>
+			    <? 
+			    for($i=3;$i<=15;$i=$i+3) { 
+			    	echo "<tr>";
+					for($j=3;$j<=15;$j=$j+3) { 
+						for($k=3;$k<=15;$k=$k+3) { 							    
+					?>
+					<td col="col_end" title="#<?=dechex($i*256+$j*16+$k);?>"  style="background-color:#<?=dechex($i*256+$j*16+$k);?>;width:8px;height:8px;font-size:6px;">&nbsp;
+					</td>
+					<?  }
+				    } 
+				    echo "</tr>";
+		        } ?>
+		</tr></table>
+
+	<script>
+	   var palette_col;
+	   $("td[col=col_end]").bind("mouseover",function(){ 
+	   
+	   	  palette_col=$(this).css("background-color");
+	   	  $("#end_color").css("background-color",palette_col);
+			palette_col = palette_col.replace("rgb(","");
+			palette_col = palette_col.replace(")","");
+			p_ary = palette_col.split(",");
+	   	   col_3b= cc.c3b(p_ary[0],p_ary[1],p_ary[2]);
+	   	   col_4f=cc.c4FFromccc3B(col_3b);
+	   	   emitter[p2dx.slot_current].setEndColor(col_4f);
+	   	   prev_string.setVisible(true);
+	   	   //emitter からテキストボックスへ
+	   	   dumpToInputTag(p2dx.slot_current);
+	   });
+
+	   $("td[col=col_end]").bind("mousedown",function(){ 
+	   	  palette_col=$(this).css("background-color");
+	   	  $("#end_color").css("background-color",palette_col);
+			palette_col = palette_col.replace("rgb(","");
+			palette_col = palette_col.replace(")","");
+			p_ary = palette_col.split(",");
+	   	   col_3b= cc.c3b(p_ary[0],p_ary[1],p_ary[2]);
+	   	   col_4f=cc.c4FFromccc3B(col_3b);
+	   	   emitter[p2dx.slot_current].setEndColor(col_4f);
+	   	   prev_string.setVisible(false);
+	   	   
+	   	   current_end_color=emitter[p2dx.slot_current].getEndColor();
+	   	   //emitter からテキストボックスへ
+	   	   dumpToInputTag(p2dx.slot_current);
+	   });
+
+	   $("td[col=col_end]").bind("mouseout",function(){ 
+	   	  palette_col=$(this).css("background-color");
+	   	  $("#end_color").css("background-color",palette_col);
+	   	   emitter[p2dx.slot_current].setEndColor(current_end_color);
+	   	   prev_string.setVisible(false);
+	   	   //emitter からテキストボックスへ
+	   	   dumpToInputTag(p2dx.slot_current);
+	   });
+	   
+	</script>	
+
+
 			<table>
 			<tr><td>		
 					Size 
@@ -1020,11 +1110,11 @@ $plist_64=base64_encode($plist_temp);
 					<input type="range" id="endSize" name="endSize" mix="0" max="400" 
 					onMouseMove="
 						if (!flg_mousedown) return;
-						emitter[slot].setEndSize(parseFloat(this.value)); dumpToInputTag();" />
+						emitter[p2dx.slot_current].setEndSize(parseFloat(this.value)); dumpToInputTag();" />
 					<input type="range" id="endSizeVar" name="endSize" mix="0" max="400" 
 					onMouseMove="
 						if (!flg_mousedown) return;
-						emitter[slot].setEndSizeVar(parseFloat(this.value)); dumpToInputTag();" />
+						emitter[p2dx.slot_current].setEndSizeVar(parseFloat(this.value)); dumpToInputTag();" />
 			</td></tr>
 			<tr><td>
 				Spin 
@@ -1034,12 +1124,12 @@ $plist_64=base64_encode($plist_temp);
 				<input type="range" id="endSpin" name="endSpin" min="-1440" max="1440" value="" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setEndSpin(parseFloat(this.value));dumpToInputTag();" />
+					emitter[p2dx.slot_current].setEndSpin(parseFloat(this.value));dumpToInputTag();" />
 				
 				<input type="range" id="endSpin_var" name="endSpin_var" min="0" max="1440" value="" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setEndSpinVar(parseFloat(this.value));dumpToInputTag();" />		
+					emitter[p2dx.slot_current].setEndSpinVar(parseFloat(this.value));dumpToInputTag();" />		
 				
 			</td></tr>
 			<tr><td>
@@ -1050,7 +1140,7 @@ $plist_64=base64_encode($plist_temp);
 						<input type="range" id="end_a" name="end_a" min="0" max="1" step="0.05" 
 						onMouseMove="
 							if (!flg_mousedown) return;
-							//$('#img[id*=end_size_pic]').css('opacity',this.value); updEndCol(); dumpToInputTag();" />
+							$('#img[id*=end_size_pic]').css('opacity',this.value); updEndCol(); dumpToInputTag();" />
 					    <input type="range" size="5" id="end_a_var" name="end_a_var" min="0" max="1" step="0.05"  
 					    onMouseMove="
 					    	if (!flg_mousedown) return;
@@ -1104,7 +1194,7 @@ $plist_64=base64_encode($plist_temp);
 		<tr><td style="vertical-align:top;">
 			</td><td style="vertical-align:top;">				
 		
-				<div id="end_color">endcolor</div>
+				
 						
 		</td></tr>				
 		</table>
@@ -1113,19 +1203,19 @@ $plist_64=base64_encode($plist_temp);
 	ColorVariance
 	<a id="cv_1" href="javascript:setColorInit(); dumpToInputTag();">0%</a> 
 	<a id="cv_2" href="javascript:
-				emitter[slot].setStartColorVar(  cc.c4f(0.1,0.1,0.1,0.5)  ); 
-				emitter[slot].setEndColor(emitter[slot].getStartColor()); 
-				emitter[slot].setEndColorVar(  cc.c4f(0,0,0,0) ); 
+				emitter[p2dx.slot_current].setStartColorVar(  cc.c4f(0.1,0.1,0.1,0.5)  ); 
+				emitter[p2dx.slot_current].setEndColor(emitter[p2dx.slot_current].getStartColor()); 
+				emitter[p2dx.slot_current].setEndColorVar(  cc.c4f(0,0,0,0) ); 
 				dumpToInputTag();">10%</a>
 	<a id="cv_3" href="javascript:
-				emitter[slot].setStartColorVar(  cc.c4f(0.2,0.2,0.2,0.5) ); 
+				emitter[p2dx.slot_current].setStartColorVar(  cc.c4f(0.2,0.2,0.2,0.5) ); 
 				dumpToInputTag();">20%</a>
 	<a id="cv_4" href="javascript:
-				emitter[slot].setStartColorVar(  cc.c4f(0.4,0.4,0.4,0.5) ); 
+				emitter[p2dx.slot_current].setStartColorVar(  cc.c4f(0.4,0.4,0.4,0.5) ); 
 				dumpToInputTag();">40%</a>
 	
 	<a id="cv_5" href="javascript:    
-				emitter[slot].setStartColorVar(cc.c4f(1,1,1,1));  
+				emitter[p2dx.slot_current].setStartColorVar(cc.c4f(1,1,1,1));  
 				dumpToInputTag();">100%</a> 								
 
 
@@ -1137,8 +1227,8 @@ $plist_64=base64_encode($plist_temp);
 	
 		<div style="border-bottom:1px solid #444444;">
 			<h4>
-			<a id="type_grav" href="javascript:toggleGravityRadius('gravity',slot);" style="font-size:140%;" >Gravity</a>    
-			<a id="type_rad"  href="javascript:toggleGravityRadius('radius',slot);"  style="font-size:140%;" >Radius</a> 
+			<a id="type_grav" href="javascript:toggleGravityRadius('gravity',p2dx.slot_current);" style="font-size:140%;" >Gravity</a>    
+			<a id="type_rad"  href="javascript:toggleGravityRadius('radius',p2dx.slot_current);"  style="font-size:140%;" >Radius</a> 
 			</h4>
 		
 			<table >
@@ -1150,21 +1240,21 @@ $plist_64=base64_encode($plist_temp);
 					<input type="range" id="duration" name="duration" min="-1" max="10" step="0.02" 
 					onMouseMove="
 						if (!flg_mousedown) return;
-						emitter[slot].setDuration(parseFloat(this.value));
-						emitter[slot].resetSystem();
+						emitter[p2dx.slot_current].setDuration(parseFloat(this.value));
+						emitter[p2dx.slot_current].resetSystem();
 						dumpToInputTag();" />
 					<input type="text" size="4" id="duration_text"name="duration_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
-							emitter[slot].setDuration(parseFloat(this.value));
-							emitter[slot].resetSystem();
+							emitter[p2dx.slot_current].setDuration(parseFloat(this.value));
+							emitter[p2dx.slot_current].resetSystem();
 							dumpToInputTag(); " > 
 					<span id="duration_forever_disp" >**</span>
 					
-					<a  href="javascript:emitter[slot].setDuration(-1);   dumpToInputTag();">Forever</a>
-					<a  href="javascript:emitter[slot].setDuration(0.01); dumpToInputTag();">0.01</a> 				
-					<a  href="javascript:emitter[slot].setDuration(0.05); dumpToInputTag();">0.05</a> 					
-					<a  href="javascript:emitter[slot].setDuration(0.5);  dumpToInputTag();">0.5</a> 
+					<a  href="javascript:emitter[p2dx.slot_current].setDuration(-1);   dumpToInputTag();">Forever</a>
+					<a  href="javascript:emitter[p2dx.slot_current].setDuration(0.01); dumpToInputTag();">0.01</a> 				
+					<a  href="javascript:emitter[p2dx.slot_current].setDuration(0.05); dumpToInputTag();">0.05</a> 					
+					<a  href="javascript:emitter[p2dx.slot_current].setDuration(0.5);  dumpToInputTag();">0.5</a> 
 					
 				</td></tr>
 				
@@ -1179,26 +1269,26 @@ $plist_64=base64_encode($plist_temp);
 					<input type="range" id="life" name="life" min="0.01" max="10" step="0.01" 
 						onMouseMove="
 								if (!flg_mousedown) return;	
-								emitter[slot].setLife( parseFloat(this.value) );
-								emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate() * emitter[slot].getLife() ));
-								dumpToInputTag(slot); " />
+								emitter[p2dx.slot_current].setLife( parseFloat(this.value) );
+								emitter[p2dx.slot_current].setTotalParticles(parseInt(emitter[p2dx.slot_current].getEmissionRate() * emitter[p2dx.slot_current].getLife() ));
+								dumpToInputTag(p2dx.slot_current); " />
 					<input type="text" size="4" id="life_text"name="life_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
-							emitter[slot].setLife(parseFloat(this.value));
-							emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate() * emitter[slot].getLife()));
+							emitter[p2dx.slot_current].setLife(parseFloat(this.value));
+							emitter[p2dx.slot_current].setTotalParticles(parseInt(emitter[p2dx.slot_current].getEmissionRate() * emitter[p2dx.slot_current].getLife()));
 							dumpToInputTag(); " > 
 								
 					<input type="range" id="lifeVar" name="lifeVar" min="0" max="10" step="0.1"
 							onMouseMove="
 								if (!flg_mousedown) return;
-								emitter[slot].setLifeVar(parseFloat(this.value));
-								dumpToInputTag(slot); " />
+								emitter[p2dx.slot_current].setLifeVar(parseFloat(this.value));
+								dumpToInputTag(p2dx.slot_current); " />
 	
 					<input type="text" size="4" id="lifeVar_text"name="lifeVar_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
-							emitter[slot].setLifeVar(parseFloat(this.value));
+							emitter[p2dx.slot_current].setLifeVar(parseFloat(this.value));
 							dumpToInputTag(); " > 
 	
 								
@@ -1211,14 +1301,14 @@ $plist_64=base64_encode($plist_temp);
 				<input id="emissionRate" name="emissionRate" type="range" min="1" max="800" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setEmissionRate(parseInt(this.value));																								emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate()*emitter[slot].getLife()));
-					dumpToInputTag(slot);"/>
+					emitter[p2dx.slot_current].setEmissionRate(parseInt(this.value));																										emitter[p2dx.slot_current].setTotalParticles(parseInt(emitter[p2dx.slot_current].getEmissionRate()*emitter[p2dx.slot_current].getLife()));
+					dumpToInputTag(p2dx.slot_current);"/>
 					
 				<input type="text" size="4" id="emissionRate_text" name="emissionRate_text" 
 					onChange="
 						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 					
-						emitter[slot].setEmissionRate(parseInt(this.value));																								emitter[slot].setTotalParticles(parseInt(emitter[slot].getEmissionRate()*emitter[slot].getLife()));
-						dumpToInputTag(slot);"/>
+						emitter[p2dx.slot_current].setEmissionRate(parseInt(this.value));																										emitter[p2dx.slot_current].setTotalParticles(parseInt(emitter[p2dx.slot_current].getEmissionRate()*emitter[p2dx.slot_current].getLife()));
+						dumpToInputTag(p2dx.slot_current);"/>
 					
 				</td></tr>
 				<tr><td>				
@@ -1229,32 +1319,32 @@ $plist_64=base64_encode($plist_temp);
 							<input id="angle" type="range" guide="1" min="-180" max="180" step="1"
 								onMouseMove="
 										if (!flg_mousedown) return;
-										emitter[slot].setAngle(parseInt(this.value)); 
-										setGuideObj(slot);
-										guiderect[slot].setVisible(true);   
-										drawAngle(slot ,emitter[slot].getAngle(),emitter[slot].getSpeed()); 
-										dumpToInputTag(slot); "/>
+										emitter[p2dx.slot_current].setAngle(parseInt(this.value)); 
+										setGuideObj(p2dx.slot_current);
+										guiderect[p2dx.slot_current].setVisible(true);   
+										drawAngle(p2dx.slot_current ,emitter[p2dx.slot_current].getAngle(),emitter[p2dx.slot_current].getSpeed()); 
+										dumpToInputTag(p2dx.slot_current); "/>
 
 							<input type="text" size="4" id="angle_text" name="angle_text" 
 								onChange="
 									if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 					
-									emitter[slot].setAngle(parseInt(this.value));												
-									dumpToInputTag(slot);"/>
+									emitter[p2dx.slot_current].setAngle(parseInt(this.value));												
+									dumpToInputTag(p2dx.slot_current);"/>
 									
 							<input id="angle_var" type="range" guide="1" min="0" max="180" step="1"
 								onMouseMove="
 										if (!flg_mousedown) return;
-										emitter[slot].setAngleVar(parseInt(this.value));
-										setGuideObj(slot); 
-										guiderect[slot].setVisible(true);
-										drawAngle(slot,emitter[slot].getAngle(),emitter[slot].getSpeed()); 
-										dumpToInputTag(slot);"/>
+										emitter[p2dx.slot_current].setAngleVar(parseInt(this.value));
+										setGuideObj(p2dx.slot_current); 
+										guiderect[p2dx.slot_current].setVisible(true);
+										drawAngle(p2dx.slot_current,emitter[p2dx.slot_current].getAngle(),emitter[p2dx.slot_current].getSpeed()); 
+										dumpToInputTag(p2dx.slot_current);"/>
 
 							<input type="text" size="4" id="angle_var_text" name="angle_var_text" 
 								onChange="
 									if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 					
-									emitter[slot].setAngleVar(parseInt(this.value));												
-									dumpToInputTag(slot);"/>
+									emitter[p2dx.slot_current].setAngleVar(parseInt(this.value));												
+									dumpToInputTag(p2dx.slot_current);"/>
 
 				</td></tr>				
 			</table>	
@@ -1340,33 +1430,33 @@ $plist_64=base64_encode($plist_temp);
 						speed  = Math.floor(Math.sqrt(angle_x * angle_x + angle_y * angle_y));
 						clog ("speed:"+ speed);
 	
-						emitter[slot].setSpeed(speed);
-						emitter[slot].setAngle(kakudo);
+						emitter[p2dx.slot_current].setSpeed(speed);
+						emitter[p2dx.slot_current].setAngle(kakudo);
 						$("#speed").attr("value",speed);
-						dumpToInputTag(slot);
+						dumpToInputTag(p2dx.slot_current);
 					});
 					$("#cv_angle").bind("mouseup",function(e){
 						angle_flag=0;
-						dumpToInputTag(slot);
+						dumpToInputTag(p2dx.slot_current);
 					});
 				</script>
 				<br/>
 	
 				<div >
 				Speed 
-				<a  href="javascript:emitter[slot].setSpeed(emitter[slot].getSpeed()*2); 
-																		emitter[slot].setRadialAccel(emitter[slot].getRadialAccel()*2);     
-																		emitter[slot].setTangentialAccel(emitter[slot].getTangentialAccel()*2);    
-																		dumpToInputTag(slot);">x2</a> 	
-				<a  href="javascript:emitter[slot].setSpeed(emitter[slot].getSpeed()/2); 
-																		emitter[slot].setRadialAccel(emitter[slot].getRadialAccel()/2);     
-																		emitter[slot].setTangentialAccel(emitter[slot].getTangentialAccel()/2);    
-																		dumpToInputTag(slot);">/2</a>		
+				<a  href="javascript:emitter[p2dx.slot_current].setSpeed(emitter[p2dx.slot_current].getSpeed()*2); 
+																		emitter[p2dx.slot_current].setRadialAccel(emitter[p2dx.slot_current].getRadialAccel()*2);     
+																		emitter[p2dx.slot_current].setTangentialAccel(emitter[p2dx.slot_current].getTangentialAccel()*2);    
+																		dumpToInputTag(p2dx.slot_current);">x2</a> 	
+				<a  href="javascript:emitter[p2dx.slot_current].setSpeed(emitter[p2dx.slot_current].getSpeed()/2); 
+																		emitter[p2dx.slot_current].setRadialAccel(emitter[p2dx.slot_current].getRadialAccel()/2);     
+																		emitter[p2dx.slot_current].setTangentialAccel(emitter[p2dx.slot_current].getTangentialAccel()/2);    
+																		dumpToInputTag(p2dx.slot_current);">/2</a>		
 			    &nbsp;&nbsp;				
 			
 				Rotate
-				<a href="javascript:rotateSlot(slot,10)">10</a>
-				<a href="javascript:rotateSlot(slot,90)">90</a>			
+				<a href="javascript:rotateSlot(p2dx.slot_current,10)">10</a>
+				<a href="javascript:rotateSlot(p2dx.slot_current,90)">90</a>			
 				</div>
 	
 	
@@ -1376,10 +1466,10 @@ $plist_64=base64_encode($plist_temp);
 				<canvas id="set_pos" style="background-color:#333333; width:<?=$boxsize?>px; height:<?=$boxsize?>px;">
 				</canvas>
 				<br/>
-				<a href="javascript:emitter[slot].setPosVar(cc.p(0,0));     dumpToInputTag(slot);">0x0</a>
-				<a href="javascript:emitter[slot].setPosVar(cc.p(160,5));   dumpToInputTag(slot);">Hor</a>			
-				<a href="javascript:emitter[slot].setPosVar(cc.p(5,240));   dumpToInputTag(slot);">Ver</a>						
-				<a href="javascript:emitter[slot].setPosVar(cc.p(160,240)); dumpToInputTag(slot);">320x480</a>
+				<a href="javascript:emitter[p2dx.slot_current].setPosVar(cc.p(0,0));     dumpToInputTag(p2dx.slot_current);">0x0</a>
+				<a href="javascript:emitter[p2dx.slot_current].setPosVar(cc.p(160,5));   dumpToInputTag(p2dx.slot_current);">Hor</a>			
+				<a href="javascript:emitter[p2dx.slot_current].setPosVar(cc.p(5,240));   dumpToInputTag(p2dx.slot_current);">Ver</a>						
+				<a href="javascript:emitter[p2dx.slot_current].setPosVar(cc.p(160,240)); dumpToInputTag(p2dx.slot_current);">320x480</a>
 				
 				<script>
 					var emit_x=0,emit_y=0,emit_flag=0;
@@ -1409,7 +1499,7 @@ $plist_64=base64_encode($plist_temp);
 					
 					$("#set_pos").bind("mousedown",function(e){
 						emit_flag=1;
-						guiderect[slot].setVisible(true);
+						guiderect[p2dx.slot_current].setVisible(true);
 					});
 					$("#set_pos").bind("mousemove",function(e){
 						if (emit_flag==0) { return; }
@@ -1419,14 +1509,14 @@ $plist_64=base64_encode($plist_temp);
 	                	emit_x = Math.abs(e.clientX - rect.left - boxsize/2) * 5;
 						emit_y = Math.abs(e.clientY - rect.top  - boxsize/2) * 5;					
 	
-						emitter[slot].setPosVar(cc.p( parseInt(emit_x)  , parseInt(emit_y) ));
-						drawEmitArea( slot , emit_x , emit_y );
-						dumpToInputTag(slot);
+						emitter[p2dx.slot_current].setPosVar(cc.p( parseInt(emit_x)  , parseInt(emit_y) ));
+						drawEmitArea( p2dx.slot_current , emit_x , emit_y );
+						dumpToInputTag(p2dx.slot_current);
 					});
 					$("#set_pos").bind("mouseup",function(e){
 						emit_flag=0;
-						guiderect[slot].setVisible(false);
-						dumpToInputTag(slot);
+						guiderect[p2dx.slot_current].setVisible(false);
+						dumpToInputTag(p2dx.slot_current);
 					});
 				</script>
 	
@@ -1470,19 +1560,19 @@ $plist_64=base64_encode($plist_temp);
 	                	grav_x = (e.clientX - rect.left - boxsize/2) ;
 						grav_y = (e.clientY - rect.top  - boxsize/2) * -1;					
 						
-						drawGrav(slot,grav_x*20,grav_y*20);
-						dumpToInputTag(slot);
+						drawGrav(p2dx.slot_current,grav_x*20,grav_y*20);
+						dumpToInputTag(p2dx.slot_current);
 					});
 					
 					$("#grav_pad").bind("mouseup",function(e){
 						grav_flag=0;
-						dumpToInputTag(slot);
+						dumpToInputTag(p2dx.slot_current);
 					});
 				</script>
 				<br/>			
-				<a href="javascript:drawGrav(slot,0,0);dumpToInputTag(slot);">OFF</a> 
-				<a href="javascript:drawGrav(slot,emitter[slot].getGravity().x * 0.8,emitter[slot].getGravity().y * 0.8);  dumpToInputTag(slot);">80%</a> 
-				<a href="javascript:drawGrav(slot,emitter[slot].getGravity().x * 1.2,emitter[slot].getGravity().y * 1.2);  dumpToInputTag(slot);">120%</a> 
+				<a href="javascript:drawGrav(p2dx.slot_current,0,0);dumpToInputTag(p2dx.slot_current);">OFF</a> 
+				<a href="javascript:drawGrav(p2dx.slot_current,emitter[p2dx.slot_current].getGravity().x * 0.8,emitter[p2dx.slot_current].getGravity().y * 0.8);  dumpToInputTag(p2dx.slot_current);">80%</a> 
+				<a href="javascript:drawGrav(p2dx.slot_current,emitter[p2dx.slot_current].getGravity().x * 1.2,emitter[p2dx.slot_current].getGravity().y * 1.2);  dumpToInputTag(p2dx.slot_current);">120%</a> 
 		</td></tr></table>
 		
 			</div>
@@ -1499,26 +1589,26 @@ $plist_64=base64_encode($plist_temp);
 				<input type="range" id="speed"    name="speed"    guide="1" min="0" max="600" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setSpeed(parseFloat(this.value));
-					dumpToInputTag(slot);" />
+					emitter[p2dx.slot_current].setSpeed(parseFloat(this.value));
+					dumpToInputTag(p2dx.slot_current);" />
 
 					<input type="text" size="4" id="speed_text"name="speed_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setSpeed(parseFloat(this.value));
+							emitter[p2dx.slot_current].setSpeed(parseFloat(this.value));
 							dumpToInputTag(); "> 
 
 
 				<input type="range" id="speedVar" name="speedVar" guide="1" min="0" max="600" 
 				onMouseMove="
 					if (!flg_mousedown) return;
-					emitter[slot].setSpeedVar(parseFloat(this.value));
-					dumpToInputTag(slot);" />
+					emitter[p2dx.slot_current].setSpeedVar(parseFloat(this.value));
+					dumpToInputTag(p2dx.slot_current);" />
 
 					<input type="text" size="4" id="speedVar_text"name="speedVar_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setSpeedVar(parseFloat(this.value));
+							emitter[p2dx.slot_current].setSpeedVar(parseFloat(this.value));
 							dumpToInputTag(); "> 
 
 			</td></tr>
@@ -1532,29 +1622,29 @@ $plist_64=base64_encode($plist_temp);
 				<input id="pos_var_x" name="pos_var_x" type="range" guide="1" min="0" max="800" 
 				   onMouseMove="
 				   		if (!flg_mousedown) return;
-				   		emitter[slot].setPosVar(cc.p(parseInt(this.value),parseInt(emitter[slot].getPosVar().y)));
-				   		setGuideObj(slot);
-						guiderect[slot].setVisible(true); 
-						dumpToInputTag(slot);"/>
+				   		emitter[p2dx.slot_current].setPosVar(cc.p(parseInt(this.value),parseInt(emitter[p2dx.slot_current].getPosVar().y)));
+				   		setGuideObj(p2dx.slot_current);
+						guiderect[p2dx.slot_current].setVisible(true); 
+						dumpToInputTag(p2dx.slot_current);"/>
 						
 				<input type="text" size="4" id="pos_var_x_text"name="pos_var_x_text" 
 					onChange="
 						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-						emitter[slot].setPosVar(cc.p(parseInt(this.value),parseInt(emitter[slot].getPosVar().y)));
+						emitter[p2dx.slot_current].setPosVar(cc.p(parseInt(this.value),parseInt(emitter[p2dx.slot_current].getPosVar().y)));
 						dumpToInputTag(); "> 
 						
 				<input id="pos_var_y" name="pos_var_y" type="range" guide="1" min="0" max="800"
 				 onMouseMove="
 						if (!flg_mousedown) return;
-						emitter[slot].setPosVar(cc.p(parseInt(emitter[slot].getPosVar().x),parseInt(this.value)));
-						setGuideObj(slot);
-						guiderect[slot].setVisible(true); 
-						dumpToInputTag(slot);"/>
+						emitter[p2dx.slot_current].setPosVar(cc.p(parseInt(emitter[p2dx.slot_current].getPosVar().x),parseInt(this.value)));
+						setGuideObj(p2dx.slot_current);
+						guiderect[p2dx.slot_current].setVisible(true); 
+						dumpToInputTag(p2dx.slot_current);"/>
 						
 				<input type="text" size="4" id="pos_var_y_text"name="pos_var_y_text" 
 					onChange="
 						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-						emitter[slot].setPosVar(cc.p(parseInt(emitter[slot].getPosVar().x),parseInt(this.value)));
+						emitter[p2dx.slot_current].setPosVar(cc.p(parseInt(emitter[p2dx.slot_current].getPosVar().x),parseInt(this.value)));
 						dumpToInputTag(); "> 			
 					
 			</td></tr>			
@@ -1568,25 +1658,25 @@ $plist_64=base64_encode($plist_temp);
 				<input id="gravity_x" name="gravity_x" type="range" guide="1" min="-1200" max="1200" 
 								onMouseMove="
 									if (!flg_mousedown) return;
-									emitter[slot].setGravity(cc.p(this.value,emitter[slot].getGravity().y)); 
-								    dumpToInputTag(slot);"/>
+									emitter[p2dx.slot_current].setGravity(cc.p(this.value,emitter[p2dx.slot_current].getGravity().y)); 
+								    dumpToInputTag(p2dx.slot_current);"/>
 								    
 				<input type="text" size="4" id="gravity_x_text"name="gravity_x_text" 
 					onChange="
 						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
-						emitter[slot].setGravity(cc.p(this.value,emitter[slot].getGravity().y)); 
+						emitter[p2dx.slot_current].setGravity(cc.p(this.value,emitter[p2dx.slot_current].getGravity().y)); 
 						dumpToInputTag(); " > 					    
 								    
 				<input id="gravity_y" name="gravity_y" type="range" guide="1" min="-1200" max="1200" 
 								onMouseMove="
 									if (!flg_mousedown) return;
-									emitter[slot].setGravity(cc.p(emitter[slot].getGravity().x,this.value));
-								    dumpToInputTag(slot);"/>
+									emitter[p2dx.slot_current].setGravity(cc.p(emitter[p2dx.slot_current].getGravity().x,this.value));
+								    dumpToInputTag(p2dx.slot_current);"/>
 
 				<input type="text" size="4" id="gravity_y_text"name="gravity_y_text" 
 					onChange="
 						if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 
-						emitter[slot].setGravity(cc.p(emitter[slot].getGravity().x , this.value)); 
+						emitter[p2dx.slot_current].setGravity(cc.p(emitter[p2dx.slot_current].getGravity().x , this.value)); 
 						dumpToInputTag(); " > 
 
 			</td></tr>			
@@ -1598,26 +1688,26 @@ $plist_64=base64_encode($plist_temp);
 						<input type="range" id="rad_accel" name="rad_accel"  min="-800" max="600"  
 						onMouseMove="
 							if (!flg_mousedown) return;
-							emitter[slot].setRadialAccel(parseFloat(this.value)); 
-							dumpToInputTag(slot); " />
+							emitter[p2dx.slot_current].setRadialAccel(parseFloat(this.value)); 
+							dumpToInputTag(p2dx.slot_current); " />
 							
 						<input type="text" size="4" id="rad_accel_text"name="rad_accel_text" 
 							onChange="
 								if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-								emitter[slot].setRadialAccel(parseFloat(this.value)); 
+								emitter[p2dx.slot_current].setRadialAccel(parseFloat(this.value)); 
 								dumpToInputTag(); "> 			
 					
 												
 						 <input type="range" id="rad_accel_var" name="rad_accel_var" min="0" max="600" 
 						  	onMouseMove="
 						  		if (!flg_mousedown) return;
-								emitter[slot].setRadialAccelVar(parseFloat(this.value)); 
-								dumpToInputTag(slot);" />
+								emitter[p2dx.slot_current].setRadialAccelVar(parseFloat(this.value)); 
+								dumpToInputTag(p2dx.slot_current);" />
 								
 						<input type="text" size="4" id="rad_accel_var_text"name="rad_accel_var_text" 
 							onChange="
 								if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-								emitter[slot].setRadialAccelVar(parseFloat(this.value)); 
+								emitter[p2dx.slot_current].setRadialAccelVar(parseFloat(this.value)); 
 								dumpToInputTag(); "> 										
 								
 				</td></tr>
@@ -1629,25 +1719,25 @@ $plist_64=base64_encode($plist_temp);
 					<input type="range" id="tan_accel" name="tan_accel" min="-800" max="800"   
 						onMouseMove="
 							if (!flg_mousedown) return;
-							emitter[slot].setTangentialAccel(parseFloat(this.value)); 
-							dumpToInputTag(slot); " />
+							emitter[p2dx.slot_current].setTangentialAccel(parseFloat(this.value)); 
+							dumpToInputTag(p2dx.slot_current); " />
 
 					<input type="text" size="4" id="tan_accel_text" name="tan_accel_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setTangentialAccel(parseFloat(this.value)); 
+							emitter[p2dx.slot_current].setTangentialAccel(parseFloat(this.value)); 
 							dumpToInputTag(); "> 	
 	
 					 <input type="range" id="tan_accel_var" name="tan_accel_var" min="0" max="600" 
 						 onMouseMove="
 						 	if (!flg_mousedown) return;
-						 	emitter[slot].setTangentialAccelVar(parseFloat(this.value)); 
-						 	dumpToInputTag(slot);" /> 	
+						 	emitter[p2dx.slot_current].setTangentialAccelVar(parseFloat(this.value)); 
+						 	dumpToInputTag(p2dx.slot_current);" /> 	
 
 					<input type="text" size="4" id="tan_accel_var_text" name="tan_accel_var_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setTangentialAccelVar(parseFloat(this.value)); 
+							emitter[p2dx.slot_current].setTangentialAccelVar(parseFloat(this.value)); 
 							dumpToInputTag(); "> 	
 
 				</td></tr>
@@ -1665,33 +1755,33 @@ $plist_64=base64_encode($plist_temp);
 					<input type="range" id="maxRadius" name="maxRadius" guide="1" min="0" max="1000" 
 					onMouseMove="
 						if (!flg_mousedown) return;
-						emitter[slot].setStartRadius(parseFloat(this.value)); 
-						setGuideObj(slot);
-						guiderect[slot].setVisible(true); 
-						dumpToInputTag(slot);" />
+						emitter[p2dx.slot_current].setStartRadius(parseFloat(this.value)); 
+						setGuideObj(p2dx.slot_current);
+						guiderect[p2dx.slot_current].setVisible(true); 
+						dumpToInputTag(p2dx.slot_current);" />
 						
 					<input type="text" size="4" id="maxRadius_text"name="maxRadius_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setStartRadius(parseFloat(this.value)); 
+							emitter[p2dx.slot_current].setStartRadius(parseFloat(this.value)); 
 							dumpToInputTag(); "> 
 						
 						
 					<input type="range" id="maxRadiusVar" name="maxRadiusVar" guide="1" min="0" max="1000" 
 					onMouseMove="
 						if (!flg_mousedown) return;
-						emitter[slot].setStartRadiusVar(parseFloat(this.value)); 
-						setGuideObj(slot);
-						guiderect[slot].setVisible(true); 
-						dumpToInputTag(slot);" 
+						emitter[p2dx.slot_current].setStartRadiusVar(parseFloat(this.value)); 
+						setGuideObj(p2dx.slot_current);
+						guiderect[p2dx.slot_current].setVisible(true); 
+						dumpToInputTag(p2dx.slot_current);" 
 					/>	
 					
 					<input type="text" size="4" id="maxRadiusVar_text"name="maxRadiusVar_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setStartRadiusVar(parseFloat(this.value)); 
+							emitter[p2dx.slot_current].setStartRadiusVar(parseFloat(this.value)); 
 							dumpToInputTag(); "> 					
-					<?=strGray("発生位置:px"); ?>	
+					<?=sGray("発生位置:px"); ?>	
 			</td></tr>			
 			<tr><td>
 					MinRadius 
@@ -1701,17 +1791,17 @@ $plist_64=base64_encode($plist_temp);
 					<input type="range" id="minRadius" name="minRadius" guide="1" min="0" max="1000" 
 						onMouseMove="
 							if (!flg_mousedown) return;
-							emitter[slot].setEndRadius(parseFloat(this.value)); 
-							setGuideObj(slot);
-							guiderect[slot].setVisible(true); 
-							dumpToInputTag(slot);" />
+							emitter[p2dx.slot_current].setEndRadius(parseFloat(this.value)); 
+							setGuideObj(p2dx.slot_current);
+							guiderect[p2dx.slot_current].setVisible(true); 
+							dumpToInputTag(p2dx.slot_current);" />
 							
 					<input type="text" size="4" id="minRadius_text" name="minRadius_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setEndRadius(parseFloat(this.value)); 
+							emitter[p2dx.slot_current].setEndRadius(parseFloat(this.value)); 
 							dumpToInputTag(); "> 	
-							<?=strGray("終了位置:px"); ?>
+							<?=sGray("終了位置:px"); ?>
 			</td></tr>
 			<tr><td>
 					Rotate/Sec
@@ -1721,57 +1811,57 @@ $plist_64=base64_encode($plist_temp);
 					 <input type="range" id="rotatePerSecond" name="rotatePerSecond" guide="1" min="-1000" max="1000"    
 					 onMouseMove="
 					 	if (!flg_mousedown) return;
-					 	emitter[slot].setRotatePerSecond(parseFloat(this.value)); 
-					 	dumpToInputTag(slot);
-					 	guiderect[slot].setVisible(true); "/>
+					 	emitter[p2dx.slot_current].setRotatePerSecond(parseFloat(this.value)); 
+					 	dumpToInputTag(p2dx.slot_current);
+					 	guiderect[p2dx.slot_current].setVisible(true); "/>
 
 					<input type="text" size="4" id="rotatePerSecond_text" name="rotatePerSecond_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setRotatePerSecond(parseFloat(this.value)); 
+							emitter[p2dx.slot_current].setRotatePerSecond(parseFloat(this.value)); 
 							dumpToInputTag(); "> 	
 
 					 	
 					 <input type="range" id="rotatePerSecondVar" name="rotatePerSecondVar" guide="1" min="0" max="1000"           
 					 onMouseMove="
 					 	if (!flg_mousedown) return;
-					 	emitter[slot].setRotatePerSecondVar(parseFloat(this.value)); 
-					 	dumpToInputTag(slot);
-					 	guiderect[slot].setVisible(true); "  />
+					 	emitter[p2dx.slot_current].setRotatePerSecondVar(parseFloat(this.value)); 
+					 	dumpToInputTag(p2dx.slot_current);
+					 	guiderect[p2dx.slot_current].setVisible(true); "  />
 
 					<input type="text" size="4" id="rotatePerSecondVar_text" name="rotatePerSecondVar_text" 
 						onChange="
 							if (!$.isNumeric(this.value)) { alert('set number!'); return false; } 						
-							emitter[slot].setRotatePerSecondVar(parseFloat(this.value)); 
-							dumpToInputTag(); "> 	<?=strGray("円周に沿った回転量"); ?>
-
-					 	
+							emitter[p2dx.slot_current].setRotatePerSecondVar(parseFloat(this.value)); 
+							dumpToInputTag(); "> 	<?=sGray("円周に沿った回転量"); ?>
 
 			</td></tr>
 			</table>
 
 			<script src="cocos2d.js"></script>
-
 			<script>
 				
-				var flg_mousedown=0;
-				var slot=0;
-				var slot_bg=0;
+				//global variables
+				p2dx = {};
+				
+				flg_mousedown = 0;
+				p2dx.slot_current = 0;
+				p2dx.slot_bg = 0;
 		
 				var png_gz_b64=<?=$json_gz_b64_png ?>;
 				var xml_base64='<?=$plist_64?>';
 				
 				var corona_base_json=$.ajax({ url: "particle/template_corona.json", async: false }).responseText;		
 				
-				var png_name=[];
-				png_name[slot]="<?=$_SESSION['png_name']?>";
-				var emitter=[];
+				png_name = [];
+				png_name[p2dx.slot_current] = "<?=$_SESSION['png_name']?>";
+				emitter = []; 
 				
 				$("input[type=range]").bind( 'mousedown' ,function(){ 
 					flg_mousedown=1; clog("mousedown"); 
 				});
 				$("input[type=range]").bind( 'mouseup', function(){ 
-					flg_mousedown=0; guiderect[slot].setVisible(false); clog("mouseup"); 
+					flg_mousedown=0; guiderect[p2dx.slot_current].setVisible(false); clog("mouseup"); 
 				});
 			</script>
 
@@ -1779,8 +1869,6 @@ $plist_64=base64_encode($plist_temp);
 </div><!-- pane_motion -->
 
 </td></tr></table>
-
-
 
 <div style="margin-left:10px;">
 	<a id="panelink_template" href="javascript:$('#plist_out').slideToggle(100);" style="font-size:80%;" >RealtimePList</a>

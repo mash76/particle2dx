@@ -1,14 +1,14 @@
 /*
-bg_node背景色の四角形 0
-bg_sprite 2
-グリッド 3
-emitter 5
-guideRect 6
-fg_sprte 7
+Z order
 
-prev_screen(drawnode) 10
-prev_emitter 11
-
+	0 bg_node背景色の四角形 
+	2 bg_sprite 
+	4 グリッド 
+	4 emitter 
+	5 guideRect 
+	6 fg_sprte 
+	7 prev_screen(drawnode) 
+	8 prev_emitter 
 
 */
 var clog=function(str) { 
@@ -37,8 +37,9 @@ var texture1;
 
 var prev_dn; // drawnode rect for Preview Mask
 var prev_string;
-var current_start_color;
 
+var current_start_color;
+var current_end_color;
 
 var MyLayer = cc.Layer.extend({
 
@@ -47,7 +48,7 @@ var MyLayer = cc.Layer.extend({
         this._super();
 
 		var size = cc.Director.getInstance().getWinSize();
-		setCSize(resos['iPhone4'],current_reso_scale);//canvas size初期値
+		setCSize(resos['iPhone6/6s'],current_reso_scale);//canvas size初期値
 
         setGrid($('#grid').val());
         
@@ -56,7 +57,7 @@ var MyLayer = cc.Layer.extend({
 		this.setKeyboardEnabled(true);
 		
 		//Mask for preview
-		prev_dn=cc.DrawNode.create();
+		prev_dn = cc.DrawNode.create();
 		prev_dn.drawPoly([cc.p(0,0),cc.p(s_size.width,0),cc.p(s_size.width,s_size.height),cc.p(0,s_size.height)] , 
 							cc.c4f(0,0,0, 0.8 ), 0, cc.c4f(0,0,0, 1 ));
 		layers=cc.Director.getInstance().getRunningScene().getChildren();
@@ -90,7 +91,7 @@ var MyLayer = cc.Layer.extend({
 		if (emitter.length==0) { return false; }
 	
 		//selected emitter active check
-		if (emitter[slot].isActive()) { 
+		if (emitter[p2dx.slot_current].isActive()) { 
 			$('#isActive').html("true"); 
 			$('#isActive').css("color","white");
 		}else { 
@@ -130,50 +131,50 @@ var MyLayer = cc.Layer.extend({
 	},
 	onTouchesBegan:function(touch,event){
 		clog("began");
-		loc = touch[0].getLocation();
-		if (slot_bg!=0) {
-			moveBGImage(slot_bg,loc);
+		var loc = touch[0].getLocation();
+		if (p2dx.slot_bg != 0) {
+			moveBGImage( p2dx.slot_bg ,loc);
 			return;
 		}
 		if (touch.length==0) { return false; }//タッチしてなければ戻る(canvas外タッチでも来るので)
 		if (emitter.length==0) { return false; }
 
-		emitter[slot].setPosition(loc);
+		emitter[p2dx.slot_current].setPosition(loc);
 		
-		if (!emitter[slot].isActive()) {emitter[slot].resetSystem();}
+		if (!emitter[p2dx.slot_current].isActive()) {emitter[p2dx.slot_current].resetSystem();}
 
 		
 		$("#emitter_posi").html(parseInt(loc.x)+" "+parseInt(loc.y));
-		guiderect[slot].setVisible(true);
+		guiderect[p2dx.slot_current].setVisible(true);
 	},
 	onTouchesMoved:function(touch,event){
 		clog("onTouchesMoved");
-		loc = touch[0].getLocation();
-		if (slot_bg!=0) {
-			moveBGImage(slot_bg,loc);
+		var loc = touch[0].getLocation();
+		if ( p2dx.slot_bg != 0) {
+			moveBGImage( p2dx.slot_bg , loc );
 			return;
 		}
 		if (touch.length==0) { return false; } //タッチしてなければ戻る(canvas外タッチでも来るので)
 		if (emitter.length==0) { return false; }
 		
-		emitter[slot].setPosition(loc);
+		emitter[p2dx.slot_current].setPosition(loc);
 		$("#emitter_posi").html(parseInt(loc.x)+" "+parseInt(loc.y));
 	},
 	onTouchesEnded:function(touch,event){
 		clog("onTouchesEnded");
-		loc = touch[0].getLocation();
-		if (slot_bg!=0) {
-			moveBGImage(slot_bg,loc);
+		var loc = touch[0].getLocation();
+		if ( p2dx.slot_bg !=0) {
+			moveBGImage(p2dx.slot_bg,loc);
 			return;
 		}
 		if (touch.length==0) { return false; } //タッチしてなければ戻る(canvas外タッチでも来るので)	
 		if (emitter.length==0) { return false; }
 		
-		emitter[slot].setPosition(loc);
+		emitter[p2dx.slot_current].setPosition(loc);
 		$('#emitter_posi').html(parseInt(loc.x)+" "+parseInt(loc.y));
-		guiderect[slot].setVisible(false);
+		guiderect[p2dx.slot_current].setVisible(false);
 		
-		dumpToInputTag(slot);
+		dumpToInputTag(p2dx.slot_current);
 	}
 });
 
@@ -197,16 +198,17 @@ function round2(val1){
 
 function setBGSlot(p_num){
 	clog("setBGSlot:"+p_num);
-	slot_bg=p_num;
-	slot=0;
+	p2dx.slot_bg = p_num;
+	p2dx.slot_current=0;
 	dumpToInputTag(p_num);
 }
+
 function moveBGImage(p_slot_bg,posi){
 	clog("moveBGImage");
-	if (p_slot_bg==-1){
+	if (p_slot_bg == -1){
 		bg_sprite.setPosition(posi);
 	}
-	if (p_slot_bg==-2){
+	if (p_slot_bg == -2){
 		fg_sprite.setPosition(posi);
 	}	
 	
@@ -253,7 +255,7 @@ function dumpToInputTag(p_slot){
 		//slotなければreturn
 		if (emitter.length==0) { return false; }
 
-		if (!p_slot) { p_slot=slot;}
+		if (!p_slot) { p_slot = p2dx.slot_current;}
 
 		$('#angle').val(parseInt(emitter[p_slot].getAngle()));		
 		$('#angle_text').val(parseInt(emitter[p_slot].getAngle()));		
@@ -573,21 +575,21 @@ function baseXML2Plist(p_slot,isPNG,p_type,baseStr){
 
 function refreshSlot(){
 
-	//clog("refreshSlot slot:"+slot+" slot_bg:"+slot_bg);
-	if (emitter.length==0) { slot=null; }
+	//clog("refreshSlot slot:"+slot+" p2dx.slot_bg:"+p2dx.slot_bg);
+	if (emitter.length==0) { p2dx.slot_current=null; }
 
 	//slotリンク作成
 	this.str="";		
 	
 	this.str+= "<table><tr><td style='vertical-align:top;' >";
 		//forground background
-		if (slot_bg==-1 && bg_sprite) bg_str='<b style="color:#EEDDDD;" >BG</b>';
+		if (p2dx.slot_bg == -1 && bg_sprite) bg_str='<b style="color:#EEDDDD;" >BG</b>';
 		else if (bg_sprite) bg_str='<span style="color:#EEDDDD;" >BG</span>';
 		else bg_str='BG';
 		
 		this.str+='<a href="javascript:setBGSlot(-1);" id="slot_m1" style="font-size:130%" >'+bg_str+'</a> ';
 
-		if (slot_bg==-2 && fg_sprite) fg_str='<b style="color:#EEDDDD;">FG</b>';
+		if (p2dx.slot_bg == -2 && fg_sprite) fg_str='<b style="color:#EEDDDD;">FG</b>';
 		else if (fg_sprite) fg_str='<span style="color:#EEDDDD;" >FG</span>';
 		else fg_str='FG';
 
@@ -619,17 +621,17 @@ function refreshSlot(){
 	$("a[id*=slot_]").css("font-weight","");
 	
 	//選択中エミッタが表示中なら太字、
-	if (slot_bg == 0 ){
-		clog("slot_bg=0");
+	if (p2dx.slot_bg == 0 ){
+		clog("p2dx.slot_bg=0");
 		if ( emitter.length > 0 ){
-			$("a[id=slot_"+slot+"]").css("font-weight","bold");
+			$("a[id=slot_" + p2dx.slot_current + "]").css("font-weight","bold");
 		}else{
 			//選択中エミッタを決め直す
 			for (ind in emitter){
 				clog("new active sch");
 				if (emitter[ind].isVisible()==true){
-					$("a[id=slot_"+ind+"]").css("font-weight","bold");
-					slot=ind;
+					$("a[id=slot_" + ind + "]").css("font-weight","bold");
+					p2dx.slot_current = ind;
 					break;
 				}
 			}
@@ -641,19 +643,19 @@ function refreshSlot(){
 	}else{
 		for (ind in emitter){
 			if (emitter[ind].isVisible()==true){
-				$("a[id=slot_"+ind+"]").css("color","");
+				$("a[id=slot_" + ind + "]").css("color","");
 			}
 		}		
-		$("#current_slot").html("Emit"+(parseInt(slot)+1));
+		$("#current_slot").html("Emit"+(parseInt( p2dx.slot_current )+1));
 	}
 }
 
 //エミッタをcocos2dxのものに変更、テクスチャはそのまま
-function setEmitter(name,p_slot){
+function setEmitter( name , p_slot ){
 
-	clog("setEmitter name: "+name+" p_slot:"+p_slot );
+	clog("setEmitter name: " + name + " p_slot:" + p_slot );
 
-	if (p_slot==null) { p_slot=slot=0; }
+	if (p_slot==null) { p_slot = p2dx.slot_current = 0; }
 
 	if (emitter[p_slot]==undefined){
 		//新規
@@ -665,7 +667,7 @@ function setEmitter(name,p_slot){
 		png_gz_b64[p_slot]=png_gz_b64["_s_fire"];
 
 
-		slot=p_slot;//今作ったものをアクティブに
+		p2dx.slot_current=p_slot;//今作ったものをアクティブに
 		new_pos=cc.p(40 + (p_slot % 4) * 120 , 60 + Math.floor(p_slot / 4) * 200);
 	}else{
 		clog("replace emitter:"+p_slot +" emitterCt:"+emitter.length);
@@ -771,7 +773,6 @@ function prevSnapshot(index){
 
 }
 
-
 function prevParticle(p_filename){
 
 	if (pre_filename == p_filename) return;
@@ -832,7 +833,7 @@ function getPlist(fname){
 	   type: "GET",
 	   url: "plist/"+fname,
 	   success:function(data){
-			xmlStr2emitter(data,slot);
+			xmlStr2emitter(data,p2dx.slot_current);
 			}
 		});	
 }
@@ -878,7 +879,7 @@ function xmlStr2emitter(p_xml,p_slot){
 	clog("xmlStr2emitter p_slot:" + p_slot);
 
 	if (p_slot==null) { 
-		slot=p_slot=0;
+		p2dx.slot_current = p_slot = 0;
 		clog("p_slot is NULL and override p_slot:" + p_slot);	
 	}
 	particle_dict=xml2ary(p_xml);
@@ -907,7 +908,7 @@ function xmlStr2emitter(p_xml,p_slot){
 		gzip_png=cc.Codec.Base64.decode(particle_dict['textureImageData']);
 		//clog("png_gz_b64:"+p_slot+" "+ particle_dict['textureImageData'].length);
 		png_gz_b64[p_slot]=particle_dict['textureImageData'];
-		clog("slot:"+slot);
+		clog("slot:" + p2dx.slot_current);
 	}else{
 		clog("no textureImageData");
 		///デフォルトのtexture
@@ -928,7 +929,8 @@ function xmlStr2emitter(p_xml,p_slot){
 	
 	prev_dn.setVisible(false);
 	prev_string.setVisible(false);
-	current_start_color=emitter[slot].getStartColor();	
+	current_start_color=emitter[p2dx.slot_current].getStartColor();	
+	current_end_color=emitter[p2dx.slot_current].getEndColor();	
 }
 
 //すべてのスロットとsnapshotをjsonに
@@ -959,14 +961,14 @@ function decodeP2DX(p2dx_JSON){
 	
 	for (ind in json){
 		clog("emit "+ind + "xml"+json[ind]);
-		slot=ind;
+		p2dx.slot_current=ind;
 		xmlStr2emitter(json[ind],ind);
 	}
 }
 
 function getSnapshot(){
 	snap[snap.length]=xml; 
-	$("#snapshots").html($("#snapshots").html()+"&nbsp;<a href='"+'javascript:xmlStr2emitter(snap['+(snap.length-1)+'],slot)' + "' " + 'onMouseOver="prevSnapshot('+(snap.length-1)+');" onMouseOut="prevEnd(); "' + '>s' + (snap.length-1) + "</a> ");
+	$("#snapshots").html($("#snapshots").html()+"&nbsp;<a href='"+'javascript:xmlStr2emitter(snap['+(snap.length-1)+'],p2dx.slot_current)' + "' " + 'onMouseOver="prevSnapshot('+(snap.length-1)+');" onMouseOut="prevEnd(); "' + '>s' + (snap.length-1) + "</a> ");
 	
 }
 function clrSnapshot(){
@@ -1098,8 +1100,8 @@ function setSlot(p_num){
 	}
 	
 	emitter[p_num].setVisible(true);
-	slot=p_num;
-	slot_bg=0;	
+	p2dx.slot_current = p_num;
+	p2dx.slot_bg = 0;	
 	dumpToInputTag(p_num);
 }
 
@@ -1117,7 +1119,7 @@ function toggleSlot(p_num){
 	}else{
 		emitter[p_num].setVisible(true);
 	}
-	slot=p_num;
+	p2dx.slot_current=p_num;
 	dumpToInputTag();
 }
 
@@ -1151,7 +1153,7 @@ function removeSlot(p_slot){
 	emitter[p_slot].removeFromParent();
 	delete emitter[p_slot];
 	emitter.splice(p_slot,1);
-	slot=0;
+	p2dx.slot_current=0;
 	refreshSlot();
 	dumpToInputTag();
 }
@@ -1168,7 +1170,7 @@ function removeOtherSlot(p_slot){
 		delete emitter[i];
 		emitter.splice(i,1);
 	}
-	slot=0;
+	p2dx.slot_current=0;
 	refreshSlot();
 	dumpToInputTag();
 }
@@ -1179,30 +1181,30 @@ function pickUpSlot(p_slot){
 
 //加工しやすい初期状態に戻す
 function setMoveInit(){
-	emitter[slot].setSpeed(50);
-	emitter[slot].setSpeedVar(0);	
+	emitter[p2dx.slot_current].setSpeed(50);
+	emitter[p2dx.slot_current].setSpeedVar(0);	
 		
-	emitter[slot].setAngle(90);
-	emitter[slot].setAngleVar(10);
+	emitter[p2dx.slot_current].setAngle(90);
+	emitter[p2dx.slot_current].setAngleVar(10);
 	
-	emitter[slot].setLifeVar(1);
+	emitter[p2dx.slot_current].setLifeVar(1);
 	
-	emitter[slot].setPosVar(cc.p(0,0));	
+	emitter[p2dx.slot_current].setPosVar(cc.p(0,0));	
 		
-	emitter[slot].setStartSpin(0);		
-	emitter[slot].setEndSpin(0);
+	emitter[p2dx.slot_current].setStartSpin(0);		
+	emitter[p2dx.slot_current].setEndSpin(0);
 
-	emitter[slot].setGravity(cc.p(0,0));
+	emitter[p2dx.slot_current].setGravity(cc.p(0,0));
 		
-	emitter[slot].setTangentialAccel(0);		
+	emitter[p2dx.slot_current].setTangentialAccel(0);		
 }
 
 function setColorInit(){
 
-	//emitter[slot].setStartColor( cc.c4f(1,0.5,0.4,1));
-	emitter[slot].setEndColor(   cc.c4f(1,0.5,0.4,1));	
-	emitter[slot].setStartColorVar( cc.c4f(0,0,0,0));
-	emitter[slot].setEndColorVar(   cc.c4f(0,0,0,0));	
+	//emitter[p2dx.slot_current].setStartColor( cc.c4f(1,0.5,0.4,1));
+	emitter[p2dx.slot_current].setEndColor(   cc.c4f(1,0.5,0.4,1));	
+	emitter[p2dx.slot_current].setStartColorVar( cc.c4f(0,0,0,0));
+	emitter[p2dx.slot_current].setEndColorVar(   cc.c4f(0,0,0,0));	
 }
 
 var base64list = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
@@ -1263,19 +1265,19 @@ function keyShortCut(keycode){
 
 
   // 38 40 up down  
-  if (keycode == 38){ changeEmitterSize(slot , 1.2); }
-  if (keycode == 40){ changeEmitterSize(slot , 0.8); }  
+  if (keycode == 38){ changeEmitterSize(p2dx.slot_current , 1.2); }
+  if (keycode == 40){ changeEmitterSize(p2dx.slot_current , 0.8); }  
 
   // r:82 rotate     37 39  left right 
-  //if (keycode == 82){ rotateSlot(slot,-10); return false;}
-  if (keycode == 37){ rotateSlot(slot,10); }
-  if (keycode == 39){ rotateSlot(slot,-10); }
+  //if (keycode == 82){ rotateSlot(p2dx.slot_current,-10); return false;}
+  if (keycode == 37){ rotateSlot(p2dx.slot_current,10); }
+  if (keycode == 39){ rotateSlot(p2dx.slot_current,-10); }
 
   //73 
 
   //g:71 gravity   r:82 radius 
-  if (keycode == 71) { toggleGravityRadius("gravity",slot); } 
-  if (keycode == 82) { toggleGravityRadius("radius",slot); } 
+  if (keycode == 71) { toggleGravityRadius("gravity",p2dx.slot_current); } 
+  if (keycode == 82) { toggleGravityRadius("radius",p2dx.slot_current); } 
 
   if (keycode == 48){ muteAllSlot(); }  //zero
   if (49 <= keycode && keycode <= 57 ){    toggleSlot(keycode-49);  }
@@ -1294,7 +1296,7 @@ function keyShortCut(keycode){
   if (keycode == 67){ toggleTopleftPane('shape'); }//  c:67 color pane   s:83 shapes
 
 
-  if (keycode == 68){ duplicateSlot(slot); }// d:68 duplicate
+  if (keycode == 68){ duplicateSlot(p2dx.slot_current); }// d:68 duplicate
 
   if (keycode == 83){ getSnapshot(); }// s:83 snapshot
 
@@ -1305,7 +1307,7 @@ function keyShortCut(keycode){
                       document.form_post_dl.submit(); }
 
   // minus 189:remove
-  if (keycode == 189){ removeSlot(slot); }
+  if (keycode == 189){ removeSlot(p2dx.slot_current); }
   // a:65 addSlot
   if (keycode == 65){ addSlot(); }  
 }
@@ -1319,6 +1321,7 @@ $(window).keydown(function(e){
     return true;
 });
 
+// 
 function setGuideRect(p_slot){
 
 	if (guiderect[p_slot]){
@@ -1346,7 +1349,7 @@ function setGuideCircle(p_slot){
 	
 	clog("setGuideCircle p_slot:"+p_slot);
 	guiderect[p_slot]=cc.DrawNode.create();
-	//guiderect[p_slot].setPosition(emitter[slot].getPosition());
+	//guiderect[p_slot].setPosition(emitter[p2dx.slot_current].getPosition());
 	
 	//開始範囲
 	guiderect[p_slot].drawDot(cc.p(0,0), emitter[p_slot].getStartRadius()+ emitter[p_slot].getStartRadiusVar() , cc.c4f(0.5,0.5,0.5, 0.3 ));//centerPos hankei color4F
