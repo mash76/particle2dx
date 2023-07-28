@@ -733,23 +733,25 @@ $plist_64=base64_encode($plist_temp);
 <div id="topleft_pane_template" style="display:none;" >
 	<table>
 	<? 
-	foreach (array("BG","Water","Fire","FireWorks","Explosion","Meteor","Snow","Click","Smoke","Magic") as $val) { 
-		
+
+	$allplists = scandir('plist');
+
+	foreach (array("BG", "Water","Fire","FireWorks","Explosion","Meteor","Snow","Click","Smoke","Magic") as $val) { 
 		echo "<tr><td>";
 		echo "<strong>".$val."</strong>";
 		echo "</td><td>";
 
-		$ary=explode("\n", trim(`ls plist | grep -i '${val}_' | grep -i 'plist'`));
-		foreach ($ary as $val1){ ?>
-			<a href="javascript:getPlist('<?=$val1 ?>')" onMouseOver="prevParticle('<?=$val1?>');" onMouseOut="prevEnd(); " ><?=preg_replace("/(.*?_)(.*)(\..*)/","$2",$val1) ?></a>
-		<? } ?>
-		</td><td>
-		 MultiEmitter 
-		<?		
-		$ary2=array();
-		$ary2=explode("\n", trim(`ls plist | grep -i '${val}_' | grep -i 'p2dx'`));
-		foreach ($ary2 as $val2){
-			echo '<a href="javascript:getP2dx('."'".$val2."'".')">'.preg_replace("/\..*/","",$val2)."</a> ";
+		foreach ($allplists as $p) {
+			if (str_contains($p, "plist") && str_contains($p, strtolower($val))) {
+				?><a href="javascript:getPlist('<?=$p ?>')" onMouseOver="prevParticle('<?=$p?>');" onMouseOut="prevEnd(); " ><?=preg_replace("/(.*?_)(.*)(\..*)/", "$2", $p) ?></a> <?
+			} 
+		}
+		echo "</td><td>";
+		echo "MultiEmitter";
+		foreach ($allplists as $p) {
+			if (str_contains($p, "p2dx") && str_contains($p, strtolower($val))) {
+				echo '<a href="javascript:getP2dx('."'".$p."'".')">'.preg_replace("/\..*/","",$p)."</a> ";
+			}
 		}
 		echo "</td></tr> ";
 	} 
@@ -792,8 +794,12 @@ $plist_64=base64_encode($plist_temp);
 	
 	<table><tr><td id='textures'>
 		<?
-		$pngs= explode("\n",trim(`ls png/ | grep -i 'png'`));
+		$pngs = scandir("png");
 		foreach ($pngs as $val){
+			if (!str_contains($val, ".png")) {
+				continue;
+			}
+
 			$val=preg_replace("/(.*)(\..*)/",'$1',trim($val)); 
 			?><a href='javascript:void(0)' onClick='setTex("<?=$val?>"); 
 													$("#textures").children("a").children("img").css("background-color",""); 
